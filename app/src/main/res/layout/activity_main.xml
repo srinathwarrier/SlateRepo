@@ -10,87 +10,66 @@
         android:layout_height="match_parent" >
 
         <LinearLayout
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="100dp"
-            android:layout_gravity="left|top">
+            android:layout_height="fill_parent"
+            android:layout_weight="0.5">
 
-            <RelativeLayout
+            <LinearLayout
+                android:orientation="horizontal"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_weight="1">
+                android:layout_height="wrap_content"
+                android:layout_gravity="left|top">
 
-                <LinearLayout
-                    android:orientation="vertical"
+
+                <TextView
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:text="Name:"
+                    android:id="@+id/nameTextView" />
+                <EditText
                     android:layout_width="fill_parent"
-                    android:layout_height="fill_parent">
+                    android:layout_height="wrap_content"
+                    android:id="@+id/nameEditText"
+                    />
+            </LinearLayout>
 
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="50dp"
-                        android:id="@+id/imageView"
-                        android:src="@mipmap/ic_launcher" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="50dp"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="Medium Text"
-                        android:id="@+id/textView" />
-                </LinearLayout>
-            </RelativeLayout>
-
-            <RelativeLayout
+            <LinearLayout
+                android:orientation="horizontal"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_weight="0.5">
+                android:layout_height="wrap_content"
+                android:layout_gravity="left|top" >
 
-                <LinearLayout
-                    android:orientation="vertical"
+                <TextView
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:text="Email Id:"
+                    android:id="@+id/emailTextView"
+                    />
+
+                <EditText
                     android:layout_width="fill_parent"
-                    android:layout_height="fill_parent">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="80dp"
-                        android:textAppearance="?android:attr/textAppearanceLarge"
-                        android:text="Large Text"
-                        android:id="@+id/textView2" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="20dp"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="Abcd"
-                        android:id="@+id/textView3"
-                        android:textAlignment="center" />
-                </LinearLayout>
-            </RelativeLayout>
+                    android:layout_height="wrap_content"
+                    android:id="@+id/emailEditText"
+                    />
+            </LinearLayout>
 
             <RelativeLayout
+                android:orientation="horizontal"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_weight="1">
+                android:layout_height="wrap_content"
+                 >
 
-                <ImageButton
+                <Button
                     android:layout_width="wrap_content"
-                    android:layout_height="100dp"
-                    android:id="@+id/imageButton"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:src="@mipmap/ic_launcher" />
+                    android:layout_height="wrap_content"
+                    android:text="Sign Up"
+                    android:id="@+id/signUpButton"
+                    android:layout_centerHorizontal="true"
+                    />
             </RelativeLayout>
-
         </LinearLayout>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="New Button"
-            android:id="@+id/button"
-            android:layout_gravity="center" />
     </FrameLayout>
 
     <!-- android:layout_gravity="start" tells DrawerLayout to treat
@@ -100,9 +79,9 @@
          android:layout_gravity="left" instead. -->
     <!-- The drawer is given a fixed width in dp and extends the full height of
          the container. -->
-    <fragment android:id="@+id/navigation_drawer"
-        android:layout_width="@dimen/navigation_drawer_width" android:layout_height="match_parent"
-        android:layout_gravity="start" android:name="com.slate.NavigationDrawerFragment"
-        tools:layout="@layout/fragment_navigation_drawer" />
+    <!--<fragment android:id="@+id/navigation_drawer"-->
+        <!--android:layout_width="@dimen/navigation_drawer_width" android:layout_height="match_parent"-->
+        <!--android:layout_gravity="start" android:name="com.slate.NavigationDrawerFragment"-->
+        <!--tools:layout="@layout/fragment_navigation_drawer" />-->
 
 </android.support.v4.widget.DrawerLayout>

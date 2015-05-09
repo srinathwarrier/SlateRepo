@@ -1,6 +1,7 @@
-package com.slate;
+package com.slate.asynctask;
 
 import android.os.AsyncTask;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -28,13 +29,15 @@ public class SlateListAsyncTask extends AsyncTask<Void,Void,Void>{
 
     ArrayList<Song> mSongArrayList;
     SlateListAdapter mSlateListAdapter;
-    String id;
+    String userId;
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
-    public SlateListAsyncTask(ArrayList<Song> songArrayList,SlateListAdapter adapter,String id)
+    public SlateListAsyncTask(ArrayList<Song> songArrayList,SlateListAdapter adapter,String id , SwipeRefreshLayout mSwipeRefreshLayout)
     {
-        this.id=id;
-        mSlateListAdapter =adapter;
-        mSongArrayList=songArrayList;
+        this.userId=id;
+        this.mSlateListAdapter =adapter;
+        this.mSongArrayList=songArrayList;
+        this.mSwipeRefreshLayout =mSwipeRefreshLayout;
     }
 
     @Override
@@ -42,7 +45,7 @@ public class SlateListAsyncTask extends AsyncTask<Void,Void,Void>{
         mSongArrayList.clear();
         StringBuilder builder = null;
         try {
-            URL url = new URL("https://slate-muzak.rhcloud.com/getSlateItems.php?id="+id);
+            URL url = new URL("https://slate-muzak.rhcloud.com/getSlateItems.php?id="+userId);
 
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
@@ -72,6 +75,7 @@ public class SlateListAsyncTask extends AsyncTask<Void,Void,Void>{
 
                 songObject.setSongID(object.get("SongID").toString());
                 songObject.setFrequency(object.get("Frequency").toString());
+                songObject.setFriendName(object.get("Name").toString());
                 songObject.setDateAdded(object.get("DateAdded").toString());
                 songObject.setSongDescription(object.get("Description").toString());
 
@@ -92,5 +96,8 @@ public class SlateListAsyncTask extends AsyncTask<Void,Void,Void>{
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
         mSlateListAdapter.notifyDataSetChanged();
+        if(this.mSwipeRefreshLayout !=null){
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
     }
 }

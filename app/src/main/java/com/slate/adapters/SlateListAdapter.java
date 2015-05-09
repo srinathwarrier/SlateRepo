@@ -12,7 +12,9 @@ import com.slate.R;
 import com.slate.entities.Song;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by I076630 on 06-May-15.
@@ -51,19 +53,29 @@ public class SlateListAdapter extends BaseAdapter {
             convertView = inflater.inflate(R.layout.slate_list_item, null);
 
             //mHolder.songIdTextView= (TextView) convertView.findViewById(R.id.outletname);
-            //mHolder.frequencyTextView= (TextView) convertView.findViewById(R.id.textView);
-            mHolder.dateAddedTextView= (TextView) convertView.findViewById(R.id.textView3);
-            mHolder.songDescTextView= (TextView) convertView.findViewById(R.id.textView2);
+            mHolder.friendNameTextView= (TextView) convertView.findViewById(R.id.friendNameTextView);
+            mHolder.dateAddedTextView= (TextView) convertView.findViewById(R.id.dateAddedTextView);
+            mHolder.songDescTextView= (TextView) convertView.findViewById(R.id.songDescTextView);
 
             convertView.setTag(mHolder);
         } else {
             mHolder = (MyViewHolder) convertView.getTag();
         }
+        String formattedString="";
+        try{
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date date = sdf.parse(mSongArrayList.get(position).getDateAdded());
+            sdf = new SimpleDateFormat("EEE, MMM d, yyyy, h:mm a");
+            formattedString = sdf.format(date);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         //mHolder.songIdTextView.setText(mSongArrayList.get(position).getSongID());
-        //mHolder.frequencyTextView.setText(mSongArrayList.get(position).getFrequency());
-        mHolder.dateAddedTextView.setText(mSongArrayList.get(position).getDateAdded());
+        mHolder.friendNameTextView.setText(mSongArrayList.get(position).getFriendName());
+        mHolder.dateAddedTextView.setText(formattedString);
         mHolder.songDescTextView.setText(mSongArrayList.get(position).getSongDescription());
+
 
         return convertView;
     }
@@ -72,7 +84,7 @@ public class SlateListAdapter extends BaseAdapter {
     static class MyViewHolder {
 
         //TextView songIdTextView;
-        //TextView frequencyTextView;
+        TextView friendNameTextView;
         TextView dateAddedTextView;
         TextView songDescTextView;
 

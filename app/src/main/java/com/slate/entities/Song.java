@@ -8,6 +8,7 @@ public class Song {
     private String frequency;
     private String dateAdded;
     private String songDescription;
+    private String friendName;
 
     public String getSongID() {
         return songID;
@@ -39,5 +40,13 @@ public class Song {
 
     public void setSongDescription(String songDescription) {
         this.songDescription = songDescription;
+    }
+
+    public String getFriendName() {
+        return friendName;
+    }
+
+    public void setFriendName(String friendName) {
+        this.friendName = friendName;
     }
 }

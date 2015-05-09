@@ -1,13 +1,40 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.slate.activities.SlateActivity">
+    tools:context="com.slate.activities.SlateActivity"
+    >
 
-    <ListView
-        android:id="@+id/slate_list_list_view"
+    <android.support.v4.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:dividerHeight="7dp"
-        android:divider="@null" />
+        android:layout_height="match_parent"
+        tools:context="com.slate.activities.SlateActivity"
+        android:id="@+id/activity_slate_swipe_refresh_layout"
+        android:background="#EDEDED">
+
+        <ListView
+            android:id="@+id/slate_list_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:dividerHeight="7dp"
+            android:divider="@null" />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <ImageButton
+        android:id="@+id/add_button"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@drawable/add_button"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="20dp"
+        android:src="@android:drawable/ic_input_add"
+        android:tint="#FFFFFF"
+        />
 
 </RelativeLayout>

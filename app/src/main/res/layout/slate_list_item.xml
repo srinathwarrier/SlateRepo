@@ -2,93 +2,81 @@
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawer_layout"
     android:layout_width="750px"
-    android:layout_height="200px"
-    tools:context=".MainActivity">
+    android:layout_height="300px"
+    tools:context=".MainActivity"
+    card_view:cardBackgroundColor="#71C3DE"
+    card_view:cardUseCompatPadding="true"
+    android:padding="10dp">
 
     <FrameLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        android:background="#FFFFFF">
 
         <LinearLayout
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="100dp"
-            android:layout_gravity="left|top">
+            android:layout_height="fill_parent"
+            android:padding="10dp">
 
-            <RelativeLayout
+            <LinearLayout
+                android:orientation="horizontal"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_weight="1">
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:id="@+id/imageView2"
+                    android:background="@drawable/round_button"
+                    android:src="@drawable/minion"
+                    android:padding="2dp"
+                    android:scaleType="fitCenter"
+                    android:adjustViewBounds="true" />
 
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="fill_parent"
-                    android:layout_height="fill_parent">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="50dp"
-                        android:id="@+id/imageView"
-                        android:src="@drawable/minion" />
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp">
 
                     <TextView
                         android:layout_width="wrap_content"
-                        android:layout_height="50dp"
+                        android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
                         android:text="Friend"
-                        android:id="@+id/textView" />
-                </LinearLayout>
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_weight="0.65">
-
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="80dp"
-                        android:textAppearance="?android:attr/textAppearanceLarge"
-                        android:text="Large Text"
-                        android:id="@+id/textView2" />
+                        android:id="@+id/friendNameTextView"
+                        android:textColor="@color/material_blue_grey_800" />
 
                     <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="20dp"
+                        android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
                         android:text="Abcd"
-                        android:id="@+id/textView3"
-                        android:textAlignment="center" />
-
+                        android:id="@+id/dateAddedTextView"
+                        android:textAlignment="center"
+                        android:textColor="#A6B3B4" />
                 </LinearLayout>
-            </RelativeLayout>
+            </LinearLayout>
 
-            <RelativeLayout
+            <LinearLayout
+                android:orientation="horizontal"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_weight="1">
+                android:layout_height="wrap_content"
+                android:paddingTop="20dp">
 
-                <ImageButton
-                    android:id="@+id/imageButton"
-                    android:layout_width="50dp"
-                    android:layout_height="100dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:src="@drawable/playlist_new"
-                    android:scaleType="fitCenter" />
-
-            </RelativeLayout>
-
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Large Text"
+                    android:id="@+id/songDescTextView"
+                    android:textColor="@color/material_blue_grey_800" />
+            </LinearLayout>
         </LinearLayout>
 
     </FrameLayout>
