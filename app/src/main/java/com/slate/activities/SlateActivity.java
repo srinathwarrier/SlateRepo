@@ -7,9 +7,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -54,7 +56,7 @@ public class SlateActivity extends AppCompatActivity implements SlateListAsyncRe
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                SlateListAsyncTask mSlateListAsyncTask = new SlateListAsyncTask(songArrayList, mSongListAdapter ,userId , mSwipeRefreshLayout);
+                SlateListAsyncTask mSlateListAsyncTask = new SlateListAsyncTask(songArrayList, mSongListAdapter, userId, mSwipeRefreshLayout);
                 mSlateListAsyncTask.execute();
             }
 
@@ -75,9 +77,10 @@ public class SlateActivity extends AppCompatActivity implements SlateListAsyncRe
 
                 alert.setPositiveButton("Add", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        AddSongAsyncTask mAddSongAsyncTask = new AddSongAsyncTask(input.getText().toString(), userId);
-                        mAddSongAsyncTask.slateListAsyncResponseDelegate = SlateActivity.this;
+                        AddSongAsyncTask mAddSongAsyncTask = new AddSongAsyncTask(input.getText().toString(), userId , songArrayList, mSwipeRefreshLayout, mSongListAdapter);
+                        //mAddSongAsyncTask.slateListAsyncResponseDelegate = SlateActivity.this;
                         mAddSongAsyncTask.execute();
+                        scrollToTop();
                     }
                 });
 
@@ -93,9 +96,6 @@ public class SlateActivity extends AppCompatActivity implements SlateListAsyncRe
         });
 
     }
-
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -124,5 +124,10 @@ public class SlateActivity extends AppCompatActivity implements SlateListAsyncRe
         mSwipeRefreshLayout.setRefreshing(true);
         SlateListAsyncTask mSlateListAsyncTask = new SlateListAsyncTask(songArrayList, mSongListAdapter ,userId , mSwipeRefreshLayout);
         mSlateListAsyncTask.execute();
+        scrollToTop();
+    }
+
+    public void scrollToTop(){
+        slateListView.smoothScrollToPosition(0);
     }
 }

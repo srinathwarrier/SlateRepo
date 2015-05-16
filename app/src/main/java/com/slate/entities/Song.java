@@ -9,6 +9,7 @@ public class Song {
     private String dateAdded;
     private String songDescription;
     private String friendName;
+    private String isUnreadStatus;
 
     public String getSongID() {
         return songID;
@@ -48,5 +49,13 @@ public class Song {
 
     public void setFriendName(String friendName) {
         this.friendName = friendName;
+    }
+
+    public String getIsUnreadStatus() {
+        return isUnreadStatus;
+    }
+
+    public void setIsUnreadStatus(String isUnreadStatus) {
+        this.isUnreadStatus = isUnreadStatus;
     }
 }

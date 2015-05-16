@@ -2,10 +2,12 @@ package com.slate.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.slate.R;
@@ -52,6 +54,8 @@ public class SlateListAdapter extends BaseAdapter {
             mHolder = new MyViewHolder();
             convertView = inflater.inflate(R.layout.slate_list_item, null);
 
+
+            mHolder.containerFrameLayout = (FrameLayout) convertView.findViewById(R.id.container);
             //mHolder.songIdTextView= (TextView) convertView.findViewById(R.id.outletname);
             mHolder.friendNameTextView= (TextView) convertView.findViewById(R.id.friendNameTextView);
             mHolder.dateAddedTextView= (TextView) convertView.findViewById(R.id.dateAddedTextView);
@@ -70,18 +74,36 @@ public class SlateListAdapter extends BaseAdapter {
         }catch (Exception e){
             e.printStackTrace();
         }
+        if(mSongArrayList.size()==0){
+            return convertView;
+        }
 
         //mHolder.songIdTextView.setText(mSongArrayList.get(position).getSongID());
         mHolder.friendNameTextView.setText(mSongArrayList.get(position).getFriendName());
         mHolder.dateAddedTextView.setText(formattedString);
         mHolder.songDescTextView.setText(mSongArrayList.get(position).getSongDescription());
 
+        // If unread item, change color of dateAddedTextView to green
+        if(mSongArrayList.get(position).getIsUnreadStatus().equals("1")){
+            // background : #6EC5B8
+            // date-text-color : material_blue_grey_800
+            mHolder.containerFrameLayout.setBackgroundColor(Color.parseColor("#6EC5B8"));
+            mHolder.dateAddedTextView.setTextColor(Color.parseColor("#ff37474f"));
+        }
+        else {
+            // background :
+            // date-text-color : #A6B3B4
+            mHolder.containerFrameLayout.setBackgroundColor(Color.parseColor("#FFFFFF"));
+            mHolder.dateAddedTextView.setTextColor(Color.parseColor("#A6B3B4"));
+        }
 
         return convertView;
     }
 
 
     static class MyViewHolder {
+
+        FrameLayout containerFrameLayout;
 
         //TextView songIdTextView;
         TextView friendNameTextView;

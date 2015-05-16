@@ -78,6 +78,7 @@ public class SlateListAsyncTask extends AsyncTask<Void,Void,Void>{
                 songObject.setFriendName(object.get("Name").toString());
                 songObject.setDateAdded(object.get("DateAdded").toString());
                 songObject.setSongDescription(object.get("Description").toString());
+                songObject.setIsUnreadStatus(object.get("Status").toString());
 
                 Log.i("Slate - song list","object:"+songObject.toString());
                 mSongArrayList.add(songObject);

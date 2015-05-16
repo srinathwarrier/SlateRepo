@@ -17,10 +17,13 @@
 
         <ListView
             android:id="@+id/slate_list_list_view"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:dividerHeight="7dp"
-            android:divider="@null" />
+            android:dividerHeight="10dp"
+            android:divider="@null"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            />
 
     </android.support.v4.widget.SwipeRefreshLayout>
 

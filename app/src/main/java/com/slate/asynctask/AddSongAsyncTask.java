@@ -2,6 +2,7 @@ package com.slate.asynctask;
 
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 
 import com.slate.adapters.SlateListAdapter;
@@ -28,19 +29,30 @@ import java.util.ArrayList;
  */
 public class AddSongAsyncTask extends AsyncTask<Void,Void,Void>{
 
+    Song songObject;
+    ArrayList<Song> mSongArrayList;
+
     String query;
     String userId;
 
-    public  SlateListAsyncResponse slateListAsyncResponseDelegate=null;
+    SlateListAdapter mSlateListAdapter;
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
-    public AddSongAsyncTask(String query, String userId)
+
+    //public  SlateListAsyncResponse slateListAsyncResponseDelegate=null;
+
+    public AddSongAsyncTask(String query, String userId , ArrayList<Song> songArrayList , SwipeRefreshLayout mSwipeRefreshLayout, SlateListAdapter adapter)
     {
         this.query=query;
         this.userId = userId;
+        this.mSongArrayList=songArrayList;
+        this.mSlateListAdapter = adapter;
+        this.mSwipeRefreshLayout = mSwipeRefreshLayout;
     }
 
     @Override
     protected Void doInBackground(Void... params) {
+        mSongArrayList.clear();
         StringBuilder builder = null;
         try {
             String query2 = Uri.encode(query, "UTF-8");
@@ -70,6 +82,22 @@ public class AddSongAsyncTask extends AsyncTask<Void,Void,Void>{
 
             JSONArray json = new JSONArray(builder.toString());
 
+            for (int i = 0; i < json.length(); i++) {
+                Log.i("Brandstore - Outletlist", "Start ");
+                songObject = new Song();
+                JSONObject object = json.getJSONObject(i);
+
+                songObject.setSongID(object.get("SongID").toString());
+                songObject.setFrequency(object.get("Frequency").toString());
+                songObject.setFriendName(object.get("Name").toString());
+                songObject.setDateAdded(object.get("DateAdded").toString());
+                songObject.setSongDescription(object.get("Description").toString());
+                songObject.setIsUnreadStatus(object.get("Status").toString());
+
+                Log.i("Slate - song list", "object:" + songObject.toString());
+                mSongArrayList.add(songObject);
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -83,9 +111,13 @@ public class AddSongAsyncTask extends AsyncTask<Void,Void,Void>{
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
+        mSlateListAdapter.notifyDataSetChanged();
+        if(this.mSwipeRefreshLayout !=null){
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
 
         //Refresh the Slate
-        slateListAsyncResponseDelegate.refreshSlate();
+        //slateListAsyncResponseDelegate.refreshSlate();
 
     }
 }

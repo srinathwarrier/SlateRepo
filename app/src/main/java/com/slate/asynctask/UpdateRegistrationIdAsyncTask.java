@@ -1,17 +1,14 @@
 package com.slate.asynctask;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.provider.Settings;
 import android.util.Log;
 
-import com.slate.activities.SlateActivity;
+import com.slate.interfaces.CheckUserAsyncResponse;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,21 +22,17 @@ import java.net.URL;
 /**
  * Created by I076630 on 06-May-15.
  */
-public class AddUserAsyncTask extends AsyncTask<Void,Void,Void>{
+public class UpdateRegistrationIdAsyncTask extends AsyncTask<Void,Void,Void>{
 
-    String userName;
-    String userEmail;
-    String android_id;
+
+    String userId;
     String registrationId;
     Context mContext;
-    String resultUserId;
 
-    public AddUserAsyncTask(String userName, String userEmail, String android_id, String registrationId, Context mContext)
+    public UpdateRegistrationIdAsyncTask(String userId, String registrationId , Context mContext)
     {
-        this.userName = userName;
-        this.userEmail = userEmail;
-        this.android_id = android_id;
-        this.registrationId = registrationId;
+        this.userId=userId;
+        this.registrationId=registrationId;
         this.mContext = mContext;
     }
 
@@ -47,7 +40,8 @@ public class AddUserAsyncTask extends AsyncTask<Void,Void,Void>{
     protected Void doInBackground(Void... params) {
         StringBuilder builder = null;
         try {
-            String urlStr= "https://slate-muzak.rhcloud.com/createNewUser.php?android_id='"+android_id+"'&name='"+userName+"'&email='"+userEmail+"'&reg_id='"+registrationId+"'";
+            String urlStr= "https://slate-muzak.rhcloud.com/updateRegID.php?id="+userId+"&reg_id="+registrationId;
+            //http://slate-muzak.rhcloud.com/updateRegID.php?id=22&reg_id=ABCD
             URL url = new URL(urlStr);
             URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
             url = uri.toURL();
@@ -69,14 +63,8 @@ public class AddUserAsyncTask extends AsyncTask<Void,Void,Void>{
         }
 
         try {
-            JSONArray json = new JSONArray(builder.toString());
-            Log.i("Slate:AddUser","1:"+json.toString() +" 2:"+json.get(0) );
-
-            // Get userId and fill into this.resultUserId
-            if(json.get(0) != "null")
-            {
-                this.resultUserId = ""+json.get(0);
-            }
+            JSONArray jsonArray = new JSONArray(builder.toString());
+            Log.i("Slate:CheckUser", "JSON :" + jsonArray.toString());
 
 
         } catch (JSONException e) {
@@ -92,19 +80,6 @@ public class AddUserAsyncTask extends AsyncTask<Void,Void,Void>{
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-
-        if(resultUserId!=null)
-        {
-            //Add new userId to SharedPreferences
-            SharedPreferences settings = mContext.getSharedPreferences("MyPrefsFile", 0);
-            SharedPreferences.Editor editor = settings.edit();
-            editor.putString("userId", resultUserId);
-            editor.commit();
-
-            // After new user is assigned, Open SlateActivity
-            Intent intent = new Intent(mContext.getApplicationContext(), SlateActivity.class);
-            mContext.startActivity(intent);
-        }
 
 
     }
