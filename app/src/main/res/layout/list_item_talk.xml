@@ -1,0 +1,58 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:id="@+id/talk_person_imageView"
+        android:background="@drawable/round_button"
+        android:src="@drawable/minion"
+        android:padding="2dp"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:layout_marginRight="100dp"
+        android:layout_toRightOf="@+id/talk_person_imageView"
+        android:layout_gravity="center"
+        android:id="@+id/talk_nameAndDateLinearLayout">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Friend"
+            android:id="@+id/talk_personName_TextView"
+            android:textColor="@color/material_blue_grey_800" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Abcd"
+            android:id="@+id/talk_date_TextView"
+            android:textAlignment="center"
+            android:textColor="@color/material_blue_grey_800" />
+    </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Test"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_below="@id/talk_nameAndDateLinearLayout"
+        android:layout_toRightOf="@id/talk_person_imageView"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:id="@+id/talk_textView"
+        />
+
+</RelativeLayout>

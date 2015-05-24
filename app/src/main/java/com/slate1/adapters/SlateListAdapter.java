@@ -18,7 +18,10 @@ import android.widget.TextView;
 
 import com.slate1.R;
 import com.slate1.activities.SlateActivity;
+import com.slate1.asynctask.GetTalksAsyncTask;
+import com.slate1.asynctask.SlateListAsyncTask;
 import com.slate1.entities.Song;
+import com.slate1.entities.Talk;
 import com.slate1.video_test.VideoFragment;
 
 import java.io.File;
@@ -74,21 +77,15 @@ public class SlateListAdapter extends BaseAdapter {
             mHolder.dateAddedTextView= (TextView) convertView.findViewById(R.id.dateAddedTextView);
             mHolder.songDescTextView= (TextView) convertView.findViewById(R.id.songDescTextView);
             mHolder.youtubeButton = (ImageButton) convertView.findViewById(R.id.youtubeButton);
+            mHolder.talkButton = (ImageButton) convertView.findViewById(R.id.talkButton);
 
 
             convertView.setTag(mHolder);
         } else {
             mHolder = (MyViewHolder) convertView.getTag();
         }
-        String formattedString="";
-        try{
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Date date = sdf.parse(mSongArrayList.get(position).getDateAdded());
-            sdf = new SimpleDateFormat("EEE, MMM d, yyyy, h:mm a");
-            formattedString = sdf.format(date);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        String formattedString=mSongArrayList.get(position).getDateAddedFormattedString();
+
         if(mSongArrayList.size()==0){
             return convertView;
         }
@@ -162,6 +159,20 @@ public class SlateListAdapter extends BaseAdapter {
 
             }
         });
+        mHolder.talkButton.setTag(position);
+        mHolder.talkButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                int currentButtonPosition = (Integer)(view.getTag());
+                String userSongId = mSongArrayList.get(currentButtonPosition).getUserSongID();
+
+
+                callOpenTalkLinearLayout(userSongId);
+                callCloseYoutubeVideo();
+                if(mContext instanceof SlateActivity){
+                    ((SlateActivity)mContext).callGetTalkAsyncTask(userSongId);
+                }
+            }
+        });
 
         return convertView;
     }
@@ -177,6 +188,7 @@ public class SlateListAdapter extends BaseAdapter {
         TextView dateAddedTextView;
         TextView songDescTextView;
         ImageButton youtubeButton;
+        ImageButton talkButton;
 
         ImageButton prevYoutubeButton;
 
@@ -199,6 +211,17 @@ public class SlateListAdapter extends BaseAdapter {
     public void callCloseYoutubeVideo(){
         if(mContext instanceof SlateActivity){
             ((SlateActivity)mContext).closeYoutubeVideo();
+        }
+    }
+
+    public void callOpenTalkLinearLayout(String userSongId){
+        if(mContext instanceof SlateActivity){
+            ((SlateActivity)mContext).openTalkLinearLayout(userSongId);
+        }
+    }
+    public void callCloseTalkLinearLayout(){
+        if(mContext instanceof SlateActivity){
+            ((SlateActivity)mContext).closeTalkLinearLayout();
         }
     }
 

@@ -68,7 +68,6 @@
                 <ImageButton
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:text="Open"
                     android:background="@null"
                     android:id="@+id/youtubeButton"
                     android:layout_gravity="end"
@@ -90,7 +89,20 @@
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:text="Large Text"
                     android:id="@+id/songDescTextView"
+                    android:layout_toLeftOf="@+id/talkButton"
+                    android:layout_alignParentLeft="true"
                     android:textColor="@color/material_blue_grey_800" />
+                <ImageButton
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@null"
+                    android:id="@+id/talkButton"
+                    android:layout_gravity="end"
+                    android:layout_centerVertical="true"
+                    android:src="@android:drawable/sym_action_chat"
+                    android:layout_alignParentRight="true"
+                    >
+                </ImageButton>
             </RelativeLayout>
         </LinearLayout>
 

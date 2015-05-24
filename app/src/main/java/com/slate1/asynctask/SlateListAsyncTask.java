@@ -61,6 +61,8 @@ public class SlateListAsyncTask extends AsyncTask<Void,Void,Void>{
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }catch(Exception e){
+            e.printStackTrace();
         }
 
         try {
@@ -80,6 +82,7 @@ public class SlateListAsyncTask extends AsyncTask<Void,Void,Void>{
                 songObject.setSongDescription(object.get("Description").toString());
                 songObject.setIsUnreadStatus(object.get("Status").toString());
                 songObject.setYoutubeLink(object.get("YoutubeLink").toString());
+                songObject.setUserSongID(object.get("ID").toString());
 
                 Log.i("Slate - song list","object:"+songObject.toString());
                 mSongArrayList.add(songObject);

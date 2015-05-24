@@ -1,5 +1,8 @@
 package com.slate1.entities;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by I076630 on 06-May-15.
  */
@@ -11,6 +14,7 @@ public class Song {
     private String friendName;
     private String isUnreadStatus;
     private String youtubeLink;
+    private String userSongID;
 
     public String getSongID() {
         return songID;
@@ -35,6 +39,21 @@ public class Song {
     public void setDateAdded(String dateAdded) {
         this.dateAdded = dateAdded;
     }
+
+    //Newly added
+    public String getDateAddedFormattedString() {
+        String formattedString="";
+        try{
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date date = sdf.parse(dateAdded);
+            sdf = new SimpleDateFormat("EEE, MMM d, yyyy, h:mm a");
+            formattedString = sdf.format(date);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return formattedString;
+    }
+
 
     public String getSongDescription() {
         return songDescription;
@@ -66,5 +85,13 @@ public class Song {
 
     public void setYoutubeLink(String youtubeLink) {
         this.youtubeLink = youtubeLink;
+    }
+
+    public String getUserSongID() {
+        return userSongID;
+    }
+
+    public void setUserSongID(String userSongID) {
+        this.userSongID = userSongID;
     }
 }

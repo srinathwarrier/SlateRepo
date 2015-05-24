@@ -115,7 +115,7 @@ public class AddSongAsyncTask extends AsyncTask<Void,Void,String>{
                 songObject.setSongDescription(object.get("Description").toString());
                 songObject.setIsUnreadStatus(object.get("Status").toString());
                 songObject.setYoutubeLink(object.get("YoutubeLink").toString());
-
+                songObject.setUserSongID(object.get("ID").toString());
                 Log.i("Slate - song list", "object:" + songObject.toString());
                 mSongArrayList.add(songObject);
             }
