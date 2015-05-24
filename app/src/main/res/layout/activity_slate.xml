@@ -3,26 +3,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.slate.activities.SlateActivity"
+    tools:context="com.slate1.activities.SlateActivity"
     >
 
     <android.support.v4.widget.SwipeRefreshLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context="com.slate.activities.SlateActivity"
+        android:layout_height="wrap_content"
+        tools:context="com.slate1.activities.SlateActivity"
         android:id="@+id/activity_slate_swipe_refresh_layout"
-        android:background="#EDEDED">
+        android:layout_above="@+id/videoLinearLayout"
+        android:background="#EDEDED"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        >
 
         <ListView
             android:id="@+id/slate_list_list_view"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:dividerHeight="10dp"
             android:divider="@null"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
             />
 
     </android.support.v4.widget.SwipeRefreshLayout>
@@ -32,12 +34,66 @@
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:background="@drawable/add_button"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_above="@+id/videoLinearLayout"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="20dp"
         android:src="@android:drawable/ic_input_add"
         android:tint="#FFFFFF"
         />
+    <LinearLayout
+        android:id="@+id/addSongLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:layout_below="@+id/activity_slate_swipe_refresh_layout"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_alignTop="@+id/activity_slate_swipe_refresh_layout"
+        android:background="#DBDB70"
+        >
+
+        <android.widget.SearchView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/suggestionSearchView"
+            />
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/suggestionListView">
+
+        </ListView>
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/songsListView">
+
+        </ListView>
+
+
+
+
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/videoLinearLayout">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/videoContainer">
+
+        </LinearLayout>
+    </LinearLayout>
+
 
 </RelativeLayout>

@@ -1,4 +1,4 @@
-package com.slate;
+package com.slate1;
 
 import android.app.Activity;
 import android.content.ComponentName;

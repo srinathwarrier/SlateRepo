@@ -1,47 +1,34 @@
-package com.slate;
+package com.slate1;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
-import android.provider.Settings;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.support.v4.widget.DrawerLayout;
 import android.widget.Button;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-
-import com.slate.activities.SlateActivity;
-import com.slate.asynctask.AddUserAsyncTask;
-import com.slate.asynctask.CheckUserAsyncTask;
-import com.slate.asynctask.SlateListAsyncTask;
-import com.slate.asynctask.UpdateRegistrationIdAsyncTask;
-import com.slate.interfaces.CheckUserAsyncResponse;
+import com.slate1.R;
+import com.slate1.activities.SlateActivity;
+import com.slate1.asynctask.AddUserAsyncTask;
+import com.slate1.asynctask.CheckUserAsyncTask;
+import com.slate1.asynctask.UpdateRegistrationIdAsyncTask;
+import com.slate1.interfaces.CheckUserAsyncResponse;
 
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class MainActivity extends AppCompatActivity implements CheckUserAsyncResponse{
@@ -96,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements CheckUserAsyncRes
         context = getApplicationContext();
         /*
         Check if userId in SharedPreferences is null or not.
-            If nu,
+            If new,
                 get 4 values : name, email, android_id, registrationId
                 Call : addNewUser.php(Name, Email, Android_ID)
                 get userId -> save it to SharedPreferences
@@ -403,6 +390,8 @@ public class MainActivity extends AppCompatActivity implements CheckUserAsyncRes
         Button signUpButton = (Button) findViewById(R.id.signUpButton);
         signUpButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
+
+
                 // New user
                 createNewUser();
             }

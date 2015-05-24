@@ -15,4 +15,14 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_demo">DemoActivity</string>
+
+    <string name="title_logo">NATIONAL GEOGRAPHIC</string>
+    <string name="btn_skip_intro">Skip Intro</string>
+    <string name="search_hint">e.g. Hero - Enrique Iglesias</string>
+
+
+
+    <string name="error_player">There was an error initializing the YouTubePlayer (%1$s)</string>
+    <string name="title_activity_video">VideoActivity</string>
+
 </resources>

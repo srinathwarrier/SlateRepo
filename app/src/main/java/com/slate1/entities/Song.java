@@ -1,4 +1,4 @@
-package com.slate.entities;
+package com.slate1.entities;
 
 /**
  * Created by I076630 on 06-May-15.
@@ -10,6 +10,7 @@ public class Song {
     private String songDescription;
     private String friendName;
     private String isUnreadStatus;
+    private String youtubeLink;
 
     public String getSongID() {
         return songID;
@@ -57,5 +58,13 @@ public class Song {
 
     public void setIsUnreadStatus(String isUnreadStatus) {
         this.isUnreadStatus = isUnreadStatus;
+    }
+
+    public String getYoutubeLink() {
+        return youtubeLink;
+    }
+
+    public void setYoutubeLink(String youtubeLink) {
+        this.youtubeLink = youtubeLink;
     }
 }

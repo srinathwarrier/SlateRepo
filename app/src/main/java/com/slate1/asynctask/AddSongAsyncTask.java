@@ -1,13 +1,13 @@
-package com.slate.asynctask;
+package com.slate1.asynctask;
 
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 
-import com.slate.adapters.SlateListAdapter;
-import com.slate.entities.Song;
-import com.slate.interfaces.SlateListAsyncResponse;
+import com.slate1.adapters.SlateListAdapter;
+import com.slate1.entities.Song;
+import com.slate1.interfaces.SlateListAsyncResponse;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,13 +27,14 @@ import java.util.ArrayList;
 /**
  * Created by I076630 on 06-May-15.
  */
-public class AddSongAsyncTask extends AsyncTask<Void,Void,Void>{
+public class AddSongAsyncTask extends AsyncTask<Void,Void,String>{
 
     Song songObject;
     ArrayList<Song> mSongArrayList;
 
     String query;
     String userId;
+    String youtubeLinkString;
 
     SlateListAdapter mSlateListAdapter;
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -41,17 +42,18 @@ public class AddSongAsyncTask extends AsyncTask<Void,Void,Void>{
 
     //public  SlateListAsyncResponse slateListAsyncResponseDelegate=null;
 
-    public AddSongAsyncTask(String query, String userId , ArrayList<Song> songArrayList , SwipeRefreshLayout mSwipeRefreshLayout, SlateListAdapter adapter)
+    public AddSongAsyncTask(String query, String userId , String youtubeLinkString, ArrayList<Song> songArrayList , SwipeRefreshLayout mSwipeRefreshLayout, SlateListAdapter adapter)
     {
         this.query=query;
         this.userId = userId;
+        this.youtubeLinkString = youtubeLinkString;
         this.mSongArrayList=songArrayList;
         this.mSlateListAdapter = adapter;
         this.mSwipeRefreshLayout = mSwipeRefreshLayout;
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    protected String doInBackground(Void... params) {
         mSongArrayList.clear();
         StringBuilder builder = null;
         try {
@@ -61,7 +63,16 @@ public class AddSongAsyncTask extends AsyncTask<Void,Void,Void>{
             URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
             url = uri.toURL();
             //URL url = new URL("https://slate-muzak.rhcloud.com/addSong.php?id=1&song_name="+query2);
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            URI uri2 = new URI(
+                    "https",
+                    "slate-muzak.rhcloud.com",
+                    "/addSong.php",
+                    "id="+this.userId+"&song_name="+this.query+"&url="+this.youtubeLinkString,
+                    null);
+            String request = uri2.toASCIIString();
+            URL url2 = new URL(request);
+
+            HttpURLConnection urlConnection = (HttpURLConnection) url2.openConnection();
 
             String line;
             builder = new StringBuilder();
@@ -70,6 +81,7 @@ public class AddSongAsyncTask extends AsyncTask<Void,Void,Void>{
             );
             BufferedReader reader = new BufferedReader(isr);
             while ((line = reader.readLine()) != null) builder.append(line);
+            return builder.toString();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         } catch (MalformedURLException e) {
@@ -78,9 +90,18 @@ public class AddSongAsyncTask extends AsyncTask<Void,Void,Void>{
             e.printStackTrace();
         }
 
+
+
+        return null;
+    }
+
+    @Override
+    protected void onPostExecute(String resultString) {
+        super.onPostExecute(resultString);
+
         try {
 
-            JSONArray json = new JSONArray(builder.toString());
+            JSONArray json = new JSONArray(resultString);
 
             for (int i = 0; i < json.length(); i++) {
                 Log.i("Brandstore - Outletlist", "Start ");
@@ -93,6 +114,7 @@ public class AddSongAsyncTask extends AsyncTask<Void,Void,Void>{
                 songObject.setDateAdded(object.get("DateAdded").toString());
                 songObject.setSongDescription(object.get("Description").toString());
                 songObject.setIsUnreadStatus(object.get("Status").toString());
+                songObject.setYoutubeLink(object.get("YoutubeLink").toString());
 
                 Log.i("Slate - song list", "object:" + songObject.toString());
                 mSongArrayList.add(songObject);
@@ -105,12 +127,7 @@ public class AddSongAsyncTask extends AsyncTask<Void,Void,Void>{
             e.printStackTrace();
         }
 
-        return null;
-    }
 
-    @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
         mSlateListAdapter.notifyDataSetChanged();
         if(this.mSwipeRefreshLayout !=null){
             mSwipeRefreshLayout.setRefreshing(false);

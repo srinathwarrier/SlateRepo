@@ -1,12 +1,12 @@
-package com.slate.asynctask;
+package com.slate1.asynctask;
 
 import android.os.AsyncTask;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.widget.TextView;
 
-import com.slate.adapters.SlateListAdapter;
-import com.slate.entities.Song;
+import com.slate1.adapters.SlateListAdapter;
+import com.slate1.entities.Song;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -79,6 +79,7 @@ public class SlateListAsyncTask extends AsyncTask<Void,Void,Void>{
                 songObject.setDateAdded(object.get("DateAdded").toString());
                 songObject.setSongDescription(object.get("Description").toString());
                 songObject.setIsUnreadStatus(object.get("Status").toString());
+                songObject.setYoutubeLink(object.get("YoutubeLink").toString());
 
                 Log.i("Slate - song list","object:"+songObject.toString());
                 mSongArrayList.add(songObject);

@@ -1,10 +1,13 @@
-package com.slate.asynctask;
+package com.slate1.asynctask;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.slate.interfaces.CheckUserAsyncResponse;
+import com.slate1.activities.SlateActivity;
+import com.slate1.interfaces.CheckUserAsyncResponse;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,17 +25,18 @@ import java.net.URL;
 /**
  * Created by I076630 on 06-May-15.
  */
-public class UpdateRegistrationIdAsyncTask extends AsyncTask<Void,Void,Void>{
+public class CheckUserAsyncTask extends AsyncTask<Void,Void,Void>{
 
-
-    String userId;
-    String registrationId;
+    String android_id;
+    String resultUserId;
+    String resultRegistrationId;
+    boolean isUserAvailable;
     Context mContext;
+    public CheckUserAsyncResponse delegate;
 
-    public UpdateRegistrationIdAsyncTask(String userId, String registrationId , Context mContext)
+    public CheckUserAsyncTask(String android_id, Context mContext)
     {
-        this.userId=userId;
-        this.registrationId=registrationId;
+        this.android_id = android_id;
         this.mContext = mContext;
     }
 
@@ -40,8 +44,7 @@ public class UpdateRegistrationIdAsyncTask extends AsyncTask<Void,Void,Void>{
     protected Void doInBackground(Void... params) {
         StringBuilder builder = null;
         try {
-            String urlStr= "https://slate-muzak.rhcloud.com/updateRegID.php?id="+userId+"&reg_id="+registrationId;
-            //http://slate-muzak.rhcloud.com/updateRegID.php?id=22&reg_id=ABCD
+            String urlStr= "https://slate-muzak.rhcloud.com/checkUser.php?android_id="+android_id+"";
             URL url = new URL(urlStr);
             URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
             url = uri.toURL();
@@ -66,6 +69,21 @@ public class UpdateRegistrationIdAsyncTask extends AsyncTask<Void,Void,Void>{
             JSONArray jsonArray = new JSONArray(builder.toString());
             Log.i("Slate:CheckUser", "JSON :" + jsonArray.toString());
 
+            // If length is 0 -> User not present. So set (isUserAvailable = false). and call addUser
+            // Else ->User present. So set (isUserAvailable = true). and call getSlateItems
+            // Get userId and fill into this.resultUserId
+
+            if(jsonArray.length()==0)
+            {
+                this.isUserAvailable = false;
+            }
+            else
+            {
+                this.isUserAvailable=true;
+                JSONObject jsonObject = (JSONObject)jsonArray.get(0);
+                this.resultUserId = jsonObject.get("ID").toString();
+                this.resultRegistrationId = jsonObject.get("RegID").toString();
+            }
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -80,6 +98,18 @@ public class UpdateRegistrationIdAsyncTask extends AsyncTask<Void,Void,Void>{
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
+
+        if(isUserAvailable)
+        {
+            // Application has mostly been uninstalled in this case, so refresh the RegistrationId
+            //TODO: Check if this.resultRegistrationId is not empty
+            delegate.updateRegistrationId(this.resultUserId);
+            //delegate.saveToSharedPreferences(this.resultUserId, this.resultRegistrationId);
+            delegate.goToSlateScreen();
+        }
+        else{
+            delegate.goToAddUserScreen();
+        }
 
 
     }

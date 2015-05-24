@@ -1,4 +1,4 @@
-package com.slate;
+package com.slate1;
 
 import android.app.IntentService;
 import android.app.NotificationManager;
@@ -11,8 +11,8 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.slate.activities.DemoActivity;
-import com.slate.activities.SlateActivity;
+import com.slate1.R;
+import com.slate1.activities.SlateActivity;
 
 /**
  * Created by I076324 on 5/13/2015.

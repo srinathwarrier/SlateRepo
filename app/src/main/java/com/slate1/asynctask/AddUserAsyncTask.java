@@ -1,17 +1,18 @@
-package com.slate.asynctask;
+package com.slate1.asynctask;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.provider.Settings;
 import android.util.Log;
 
-import com.slate.activities.SlateActivity;
-import com.slate.interfaces.CheckUserAsyncResponse;
+import com.slate1.activities.SlateActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,26 +26,42 @@ import java.net.URL;
 /**
  * Created by I076630 on 06-May-15.
  */
-public class CheckUserAsyncTask extends AsyncTask<Void,Void,Void>{
+public class AddUserAsyncTask extends AsyncTask<Void,Void,Void>{
 
+    String userName;
+    String userEmail;
     String android_id;
-    String resultUserId;
-    String resultRegistrationId;
-    boolean isUserAvailable;
+    String registrationId;
     Context mContext;
-    public CheckUserAsyncResponse delegate;
+    String resultUserId;
+    ProgressDialog progress;
 
-    public CheckUserAsyncTask(String android_id, Context mContext)
+    public AddUserAsyncTask(String userName, String userEmail, String android_id, String registrationId, Context mContext)
     {
+        this.userName = userName;
+        this.userEmail = userEmail;
         this.android_id = android_id;
+        this.registrationId = registrationId;
         this.mContext = mContext;
+    }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+
+        progress = new ProgressDialog(this.mContext);
+        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progress.setIndeterminate(true);
+        progress.setCancelable(false);
+        progress.setCanceledOnTouchOutside(false);
+        progress.show();
     }
 
     @Override
     protected Void doInBackground(Void... params) {
         StringBuilder builder = null;
         try {
-            String urlStr= "https://slate-muzak.rhcloud.com/checkUser.php?android_id="+android_id+"";
+            String urlStr= "https://slate-muzak.rhcloud.com/createNewUser.php?android_id='"+android_id+"'&name='"+userName+"'&email='"+userEmail+"'&reg_id='"+registrationId+"'";
             URL url = new URL(urlStr);
             URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
             url = uri.toURL();
@@ -66,24 +83,15 @@ public class CheckUserAsyncTask extends AsyncTask<Void,Void,Void>{
         }
 
         try {
-            JSONArray jsonArray = new JSONArray(builder.toString());
-            Log.i("Slate:CheckUser", "JSON :" + jsonArray.toString());
+            JSONArray json = new JSONArray(builder.toString());
+            Log.i("Slate:AddUser","1:"+json.toString() +" 2:"+json.get(0) );
 
-            // If length is 0 -> User not present. So set (isUserAvailable = false). and call addUser
-            // Else ->User present. So set (isUserAvailable = true). and call getSlateItems
             // Get userId and fill into this.resultUserId
+            if(json.get(0) != "null")
+            {
+                this.resultUserId = ""+json.get(0);
+            }
 
-            if(jsonArray.length()==0)
-            {
-                this.isUserAvailable = false;
-            }
-            else
-            {
-                this.isUserAvailable=true;
-                JSONObject jsonObject = (JSONObject)jsonArray.get(0);
-                this.resultUserId = jsonObject.get("ID").toString();
-                this.resultRegistrationId = jsonObject.get("RegID").toString();
-            }
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -99,16 +107,19 @@ public class CheckUserAsyncTask extends AsyncTask<Void,Void,Void>{
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
 
-        if(isUserAvailable)
+        if(resultUserId!=null)
         {
-            // Application has mostly been uninstalled in this case, so refresh the RegistrationId
-            //TODO: Check if this.resultRegistrationId is not empty
-            delegate.updateRegistrationId(this.resultUserId);
-            //delegate.saveToSharedPreferences(this.resultUserId, this.resultRegistrationId);
-            delegate.goToSlateScreen();
-        }
-        else{
-            delegate.goToAddUserScreen();
+            //Add new userId to SharedPreferences
+            SharedPreferences settings = mContext.getSharedPreferences("MyPrefsFile", 0);
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putString("userId", resultUserId);
+            editor.commit();
+
+            progress.dismiss();
+
+            // After new user is assigned, Open SlateActivity
+            Intent intent = new Intent(mContext.getApplicationContext(), SlateActivity.class);
+            mContext.startActivity(intent);
         }
 
 
