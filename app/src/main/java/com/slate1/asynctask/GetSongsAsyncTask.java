@@ -7,6 +7,7 @@ import android.util.Log;
 import com.slate1.adapters.YoutubeSongListAdapter;
 import com.slate1.entities.YoutubeSong;
 import com.slate1.interfaces.SuggestionAsyncResponse;
+import com.slate1.util.Connections;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -63,14 +64,8 @@ public class GetSongsAsyncTask extends AsyncTask<Void,Void,String>{
 
         StringBuilder builder = null;
         try {
-            URI uri = new URI(
-                    "https",
-                    "slate-muzak.rhcloud.com",
-                    "/suggestion.php",
-                    "suggestion="+this.suggestionString,
-                    null);
-            String request = uri.toASCIIString();
-            URL url = new URL(request);
+            String urlString = new Connections().getSongURL(suggestionString);
+            URL url = new URL(urlString);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
             String line;

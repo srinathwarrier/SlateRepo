@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import com.slate1.adapters.SlateListAdapter;
 import com.slate1.entities.Song;
+import com.slate1.util.Connections;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,7 +24,7 @@ import java.util.ArrayList;
 /**
  * Created by I076630 on 06-May-15.
  */
-public class SlateListAsyncTask extends AsyncTask<Void,Void,Void>{
+public class SlateListAsyncTask extends AsyncTask<Void,Void,String>{
 
     Song songObject;
 
@@ -41,11 +42,12 @@ public class SlateListAsyncTask extends AsyncTask<Void,Void,Void>{
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    protected String doInBackground(Void... params) {
         mSongArrayList.clear();
         StringBuilder builder = null;
         try {
-            URL url = new URL("https://slate-muzak.rhcloud.com/getSlateItems.php?id="+userId);
+            String urlString = new Connections().getSlateItemsURL(userId);
+            URL url = new URL(urlString);
 
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
@@ -57,6 +59,8 @@ public class SlateListAsyncTask extends AsyncTask<Void,Void,Void>{
             );
             BufferedReader reader = new BufferedReader(isr);
             while ((line = reader.readLine()) != null) builder.append(line);
+
+            return builder.toString();
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -65,10 +69,18 @@ public class SlateListAsyncTask extends AsyncTask<Void,Void,Void>{
             e.printStackTrace();
         }
 
+
+
+        return null;
+    }
+
+    @Override
+    protected void onPostExecute(String resultString) {
+        super.onPostExecute(resultString);
+
         try {
 
-            JSONArray json = new JSONArray(builder.toString());
-
+            JSONArray json = new JSONArray(resultString);
 
             for (int i = 0; i < json.length(); i++) {
                 Log.i("Brandstore - Outletlist", "Start ");
@@ -83,6 +95,7 @@ public class SlateListAsyncTask extends AsyncTask<Void,Void,Void>{
                 songObject.setIsUnreadStatus(object.get("Status").toString());
                 songObject.setYoutubeLink(object.get("YoutubeLink").toString());
                 songObject.setUserSongID(object.get("ID").toString());
+                songObject.setNoOfTalks(object.get("No_of_Comments").toString());
 
                 Log.i("Slate - song list","object:"+songObject.toString());
                 mSongArrayList.add(songObject);
@@ -94,12 +107,7 @@ public class SlateListAsyncTask extends AsyncTask<Void,Void,Void>{
             e.printStackTrace();
         }
 
-        return null;
-    }
-
-    @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
+        mSlateListAdapter.resetFilteredSongArrayList();
         mSlateListAdapter.notifyDataSetChanged();
         if(this.mSwipeRefreshLayout !=null){
             mSwipeRefreshLayout.setRefreshing(false);

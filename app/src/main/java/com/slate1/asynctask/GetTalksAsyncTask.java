@@ -10,6 +10,7 @@ import com.slate1.adapters.YoutubeSongListAdapter;
 import com.slate1.entities.Talk;
 import com.slate1.entities.YoutubeSong;
 import com.slate1.interfaces.SuggestionAsyncResponse;
+import com.slate1.util.Connections;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,16 +32,18 @@ public class GetTalksAsyncTask extends AsyncTask<Void,Void,String>{
 
     Context mContext;
     String userSongId;
+    String userId;
     ArrayList<Talk> mTalkArrayList;
     TalkListAdapter mAdapter;
     ProgressDialog progress;
 
-    public GetTalksAsyncTask(TalkListAdapter adapter, ArrayList<Talk> talkArrayList, Context mContext, String userSongId)
+    public GetTalksAsyncTask(TalkListAdapter adapter, ArrayList<Talk> talkArrayList, Context mContext, String userSongId, String userId)
     {
         this.mAdapter = adapter;
         this.mTalkArrayList= talkArrayList;
         this.mContext = mContext;
         this.userSongId = userSongId;
+        this.userId = userId;
     }
 
     @Override
@@ -62,14 +65,8 @@ public class GetTalksAsyncTask extends AsyncTask<Void,Void,String>{
 
         StringBuilder builder = null;
         try {
-            URI uri = new URI(
-                    "https",
-                    "slate-muzak.rhcloud.com",
-                    "/getComment.php",
-                    "usersongid="+this.userSongId,
-                    null);
-            String request = uri.toASCIIString();
-            URL url = new URL(request);
+            String urlString = new Connections().getTalksURL(userSongId,userId);
+            URL url = new URL(urlString);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
             String line;

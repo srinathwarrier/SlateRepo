@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.slate1.activities.SlateActivity;
 import com.slate1.interfaces.CheckUserAsyncResponse;
+import com.slate1.util.Connections;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,10 +45,8 @@ public class CheckUserAsyncTask extends AsyncTask<Void,Void,Void>{
     protected Void doInBackground(Void... params) {
         StringBuilder builder = null;
         try {
-            String urlStr= "https://slate-muzak.rhcloud.com/checkUser.php?android_id="+android_id+"";
-            URL url = new URL(urlStr);
-            URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
-            url = uri.toURL();
+            String urlString = new Connections().getCheckUserURL(android_id);
+            URL url = new URL(urlString);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
             String line;
@@ -57,8 +56,6 @@ public class CheckUserAsyncTask extends AsyncTask<Void,Void,Void>{
             );
             BufferedReader reader = new BufferedReader(isr);
             while ((line = reader.readLine()) != null) builder.append(line);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {

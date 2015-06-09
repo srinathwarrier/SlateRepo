@@ -29,7 +29,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="Friend"
             android:id="@+id/talk_personName_TextView"
             android:textColor="@color/material_blue_grey_800" />
@@ -37,7 +37,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textSize="12sp"
             android:text="Abcd"
             android:id="@+id/talk_date_TextView"
             android:textAlignment="center"
@@ -46,6 +46,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="15sp"
         android:text="Test"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:layout_below="@id/talk_nameAndDateLinearLayout"

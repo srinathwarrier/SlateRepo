@@ -1,16 +1,20 @@
 package com.slate1.activities;
 
+import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -23,6 +27,7 @@ import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.slate1.R;
+import com.slate1.SlateApplication;
 import com.slate1.adapters.SlateListAdapter;
 import com.slate1.adapters.TalkListAdapter;
 import com.slate1.adapters.YoutubeSongListAdapter;
@@ -37,6 +42,7 @@ import com.slate1.entities.Talk;
 import com.slate1.entities.YoutubeSong;
 import com.slate1.interfaces.SlateListAsyncResponse;
 import com.slate1.interfaces.SuggestionAsyncResponse;
+import com.slate1.util.Connections;
 import com.slate1.video_test.VideoFragment;
 
 import java.util.ArrayList;
@@ -47,6 +53,7 @@ public class SlateActivity extends AppCompatActivity implements SlateListAsyncRe
     // Default parameters :
     public static final String PREFS_NAME = "MyPrefsFile";
     public String userId;
+    public Context mContext;
 
     // Slate values :
     ArrayList<Song> songArrayList = new ArrayList();
@@ -82,20 +89,23 @@ public class SlateActivity extends AppCompatActivity implements SlateListAsyncRe
     public TalkListAdapter talkListAdapter;
 
 
+    private Menu mOptionsMenu;
+
+
     @Override
     public void onBackPressed() {
         if(isYoutubePlayerLinearLayoutVisible){
-            mSlateListAdapter.prevButtonPosition=-1;
-            mSlateListAdapter.notifyDataSetChanged();
-            closeYoutubeVideo();
+            revertPlayButtonAndCloseYoutubeVideo();
             return;
         }
         if(isAddSongLinearLayoutVisible){
             if(addSongLinearLayout!=null)closeAddSongLinearLayout();
+            showSearchButton();
             return;
         }
         if(isTalkLinearLayoutVisible){
             if(talkLinearLayout!=null)closeTalkLinearLayout();
+            showSearchButton();
             return;
         }
         else{
@@ -104,12 +114,16 @@ public class SlateActivity extends AppCompatActivity implements SlateListAsyncRe
 
     }
 
+    /*
+        Default Activity methods
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_slate);
-        setTitle("Slate");
+        setTitle(new Connections().getSystemNameCamelCase());
+        mContext =SlateActivity.this;
 
         // Fetch userId from SharedPreferences
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
@@ -122,8 +136,8 @@ public class SlateActivity extends AppCompatActivity implements SlateListAsyncRe
         mSlateListAdapter= new SlateListAdapter(songArrayList,this);
         slateListView.setAdapter(mSlateListAdapter);
 
-        SlateListAsyncTask mSlateListAsyncTask = new SlateListAsyncTask(songArrayList, mSlateListAdapter ,userId,mSwipeRefreshLayout);
-        mSlateListAsyncTask.execute();
+        //SlateListAsyncTask mSlateListAsyncTask = new SlateListAsyncTask(songArrayList, mSlateListAdapter ,userId,mSwipeRefreshLayout);
+        //mSlateListAsyncTask.execute();
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -131,9 +145,7 @@ public class SlateActivity extends AppCompatActivity implements SlateListAsyncRe
                 SlateListAsyncTask mSlateListAsyncTask = new SlateListAsyncTask(songArrayList, mSlateListAdapter, userId, mSwipeRefreshLayout);
                 mSlateListAsyncTask.execute();
                 if(isYoutubePlayerLinearLayoutVisible){
-                    mSlateListAdapter.prevButtonPosition=-1;
-                    mSlateListAdapter.notifyDataSetChanged();
-                    closeYoutubeVideo();
+                    revertPlayButtonAndCloseYoutubeVideo();
                 }
             }
 
@@ -189,11 +201,13 @@ public class SlateActivity extends AppCompatActivity implements SlateListAsyncRe
         addButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 if (isYoutubePlayerLinearLayoutVisible) {
-                    mSlateListAdapter.prevButtonPosition = -1;
-                    mSlateListAdapter.notifyDataSetChanged();
-                    closeYoutubeVideo();
+                    revertPlayButtonAndCloseYoutubeVideo();
+                }
+                if(isTalkLinearLayoutVisible){
                     closeTalkLinearLayout();
                 }
+                hideSearchButton();
+                collapseSearchButton();
                 openAddSongLinearLayout();
             }
 
@@ -212,20 +226,110 @@ public class SlateActivity extends AppCompatActivity implements SlateListAsyncRe
         Button talkSendButton = (Button) findViewById(R.id.talkSendButton);
         talkSendButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                String talkText= talkEditText.getText().toString();
-                if(!(talkText==null || talkText.equals(""))){
-                    String userSongId=talkEditText.getTag().toString();
+                String talkText = talkEditText.getText().toString();
+                if (!(talkText == null || talkText.equals(""))) {
+                    String userSongId = talkEditText.getTag().toString();
                     callAddTalkAsyncTask(userId, userSongId, talkText);
                 }
             }
         });
+        getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
+        refreshSlate();
+    }
+
+    @Override
+    protected void onNewIntent(Intent i) {
+
+        boolean isNotification = i.getExtras().getBoolean("IS_NOTIFICATION");
+        if(isNotification){
+            SlateApplication application = (SlateApplication) getApplication();
+            int currentNumUnreadMessages = application.getNumUnreadMessages();
+            application.removeAllNotifications();            // clear the Messages in the InboxStyle
+            String notificationTypeString = i.getExtras().getString("NOTIFICATION_TYPE");
+            SlateApplication.NotificationType notificationType = (SlateApplication.NotificationType)i.getSerializableExtra("NOTIFICATION_TYPE");
+            String userSongId=i.getExtras().getString("USER_SONG_ID");
+
+            // When coming from notification click,
+            // If (notificationType == talkedAboutSong )  , then open talk screen  , and in bg refresh screen
+            // If (notificationType == addedSong ) , then simply refresh the screen
+
+
+            if(currentNumUnreadMessages == 1 &&
+                    notificationType!=null &&
+                    notificationType == SlateApplication.NotificationType.TALK_SONG &&
+                    userSongId!=null &&
+                    !userSongId.equals("")  ){
+
+                    collapseSearchButton();
+                    hideSearchButton();
+                    revertPlayButtonAndCloseYoutubeVideo();
+
+                    openTalkLinearLayout(userSongId);
+                    callGetTalkAsyncTask(userSongId);
+
+            }
+
+        }
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_slate, menu);
-        return true;
+        restoreActionBar();
+        mOptionsMenu = menu;
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        //searchView.setIconifiedByDefault(false);
+
+        SearchView.OnQueryTextListener textChangeListener = new SearchView.OnQueryTextListener()
+        {
+            @Override
+            public boolean onQueryTextChange(String newText)
+            {
+                // this is your adapter that will be filtered
+                mSlateListAdapter.getFilter().filter(newText);
+                System.out.println("on text chnge text: "+newText);
+                return true;
+            }
+            @Override
+            public boolean onQueryTextSubmit(String query)
+            {
+                // this is your adapter that will be filtered
+                mSlateListAdapter.getFilter().filter(query);
+                System.out.println("on query submit: "+query);
+                return true;
+            }
+        };
+        searchView.setOnQueryTextListener(textChangeListener);
+
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                if (isYoutubePlayerLinearLayoutVisible) {
+                    revertPlayButtonAndCloseYoutubeVideo();
+                }
+                if (isTalkLinearLayoutVisible) {
+                    closeTalkLinearLayout();
+                }
+            }
+
+        });
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -239,9 +343,23 @@ public class SlateActivity extends AppCompatActivity implements SlateListAsyncRe
         if (id == R.id.action_settings) {
             return true;
         }
+//        else if (id == R.id.action_search){
+//            return true;
+//        }
 
         return super.onOptionsItemSelected(item);
     }
+
+    public void restoreActionBar() {
+        ActionBar actionBar = getSupportActionBar();
+        //actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setTitle(new Connections().getSystemNameCamelCase());
+    }
+
+    /*
+        Slate content methods
+     */
 
     @Override
     public void refreshSlate() {
@@ -254,6 +372,36 @@ public class SlateActivity extends AppCompatActivity implements SlateListAsyncRe
     public void scrollToTop(){
         slateListView.smoothScrollToPosition(0);
     }
+
+    /*
+        Search slate methods
+     */
+
+    public void collapseSearchButton(){
+        if(mOptionsMenu!=null){
+            SearchView searchView = (SearchView)mOptionsMenu.findItem(R.id.action_search).getActionView();
+            searchView.onActionViewCollapsed();
+        }
+    }
+
+    public void hideSearchButton(){
+        if(mOptionsMenu!=null){
+            SearchView searchView = (SearchView)mOptionsMenu.findItem(R.id.action_search).getActionView();
+            searchView.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    public void showSearchButton(){
+        if(mOptionsMenu!=null){
+            SearchView searchView = (SearchView)mOptionsMenu.findItem(R.id.action_search).getActionView();
+            searchView.setVisibility(View.VISIBLE);
+        }
+    }
+
+
+    /*
+           Youtube video methods
+     */
 
     public void openYoutubeVideo(String youtubeLink){
         isYoutubePlayerLinearLayoutVisible = true;
@@ -278,10 +426,55 @@ public class SlateActivity extends AppCompatActivity implements SlateListAsyncRe
         }
     }
 
+    public void revertPlayButtonAndCloseYoutubeVideo(){
+        mSlateListAdapter.prevButtonPosition = -1;
+        mSlateListAdapter.notifyDataSetChanged();
+        closeYoutubeVideo();
+    }
+
+
+    /*
+        Add song methods
+     */
+
+    public void openAddSongLinearLayout(){
+        isAddSongLinearLayoutVisible=true;
+        showSuggestionListView=true;
+        RelativeLayout.LayoutParams rlp= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
+        rlp.setMargins(50, 50, 50, 50);
+        addSongLinearLayout.setLayoutParams(rlp);
+        searchView.setIconified(false);
+        searchView.setQuery("", false);
+    }
+
+    public void closeAddSongLinearLayout(){
+        isAddSongLinearLayoutVisible=false;
+        RelativeLayout.LayoutParams rlp= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,0);
+        rlp.setMargins(50, 50, 50, 50);
+        addSongLinearLayout.setLayoutParams(rlp);
+//        searchView.setIconified(true);
+//        if(this.getCurrentFocus()!=null)
+//        {
+//            this.getCurrentFocus().clearFocus();
+//        }
+        searchView.clearFocus();
+    }
+
+    public void emptySuggestionListView() {
+        suggestionArrayList.clear();
+        suggestionArrayAdapter.notifyDataSetChanged();
+    }
+
+    public void emptySongListView() {
+        youtubeSongArrayList.clear();
+        youtubeSongListAdapter.notifyDataSetChanged();
+    }
+
+
     @Override
     public boolean onQueryTextSubmit(String query) {
         mSlateListAdapter = new SlateListAdapter(songArrayList,this);
-        slateListView.setAdapter(mSlateListAdapter );
+        slateListView.setAdapter(mSlateListAdapter);
 
         GetSongsAsyncTask getSongsAsyncTask = new GetSongsAsyncTask(query,youtubeSongListAdapter,youtubeSongArrayList, this);
         getSongsAsyncTask.delegate = this;
@@ -316,32 +509,9 @@ public class SlateActivity extends AppCompatActivity implements SlateListAsyncRe
         return false;
     }
 
-    public void emptySuggestionListView() {
-        suggestionArrayList.clear();
-        suggestionArrayAdapter.notifyDataSetChanged();
-    }
-
-    public void emptySongListView() {
-        youtubeSongArrayList.clear();
-        youtubeSongListAdapter.notifyDataSetChanged();
-    }
-
-    public void openAddSongLinearLayout(){
-        isAddSongLinearLayoutVisible=true;
-        showSuggestionListView=true;
-        RelativeLayout.LayoutParams rlp= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
-        rlp.setMargins(50, 50, 50, 50);
-        addSongLinearLayout.setLayoutParams(rlp);
-        searchView.setIconified(false);
-        searchView.setQuery("", false);
-    }
-
-    public void closeAddSongLinearLayout(){
-        isAddSongLinearLayoutVisible=false;
-        RelativeLayout.LayoutParams rlp= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,0);
-        rlp.setMargins(50, 50, 50, 50);
-        addSongLinearLayout.setLayoutParams(rlp);
-    }
+    /*
+        Talk(comment) Screen methods
+     */
 
     public void openTalkLinearLayout(String userSongId){
         talkEditText.setTag(userSongId);
@@ -361,8 +531,7 @@ public class SlateActivity extends AppCompatActivity implements SlateListAsyncRe
     }
 
     public void callGetTalkAsyncTask(String userSongId){
-
-        GetTalksAsyncTask getTalksAsyncTask = new GetTalksAsyncTask(talkListAdapter, talkArrayList, this, userSongId);
+        GetTalksAsyncTask getTalksAsyncTask = new GetTalksAsyncTask(talkListAdapter, talkArrayList, this, userSongId , this.userId);
         getTalksAsyncTask.execute();
     }
 

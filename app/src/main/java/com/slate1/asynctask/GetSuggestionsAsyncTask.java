@@ -55,15 +55,12 @@ public class GetSuggestionsAsyncTask extends AsyncTask<Void,Void,Document>{
         super.onPreExecute();
         stringArrayList.clear();
         this.mAdapter.notifyDataSetChanged();
-        Log.e("AsyncTask", "onPreExecute");
+        Log.i("AsyncTask", "onPreExecute");
     }
 
     @Override
     protected Document doInBackground(Void... params) {
-
         try {
-
-
             String urlStr="https://suggestqueries.google.com/complete/search?client=toolbar&ds=yt&q="+this.suggestionString;
             URL url = new URL(urlStr);
 

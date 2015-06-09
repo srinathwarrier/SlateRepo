@@ -15,6 +15,7 @@ public class Song {
     private String isUnreadStatus;
     private String youtubeLink;
     private String userSongID;
+    private String noOfTalks;
 
     public String getSongID() {
         return songID;
@@ -93,5 +94,13 @@ public class Song {
 
     public void setUserSongID(String userSongID) {
         this.userSongID = userSongID;
+    }
+
+    public String getNoOfTalks() {
+        return noOfTalks;
+    }
+
+    public void setNoOfTalks(String noOfTalks) {
+        this.noOfTalks = noOfTalks;
     }
 }

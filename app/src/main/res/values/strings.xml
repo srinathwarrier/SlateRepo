@@ -11,6 +11,7 @@
     <string name="action_example">Example action</string>
 
     <string name="action_settings">Settings</string>
+    <string name="action_search">Search</string>
     <string name="title_activity_slate">SlateActivity</string>
 
     <string name="hello_world">Hello world!</string>
@@ -18,7 +19,7 @@
 
     <string name="title_logo">NATIONAL GEOGRAPHIC</string>
     <string name="btn_skip_intro">Skip Intro</string>
-    <string name="search_hint">e.g. Hero - Enrique Iglesias</string>
+    <string name="search_hint">Search for User, Song or Artist</string>
 
 
 

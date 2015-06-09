@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -28,29 +30,35 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by I076630 on 06-May-15.
  */
-public class SlateListAdapter extends BaseAdapter {
+public class SlateListAdapter extends BaseAdapter implements Filterable {
     ArrayList<Song> mSongArrayList;
+    ArrayList<Song> mFilteredSongArrayList;
     private LayoutInflater inflater;
     private Context mContext;
     //private boolean isVideoPlaying;
     //private int currentVideoPosition;
     public int prevButtonPosition=-1;
+    private ItemFilter mFilter = new ItemFilter();
+
 
     public SlateListAdapter(ArrayList<Song> songArrayList , Activity context){
         this.inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mSongArrayList= songArrayList;
+        resetFilteredSongArrayList();
+        //mFilteredSongArrayList = songArrayList;
         this.mContext = context;
     }
 
 
     @Override
     public int getCount() {
-        return mSongArrayList.size();
+        return mFilteredSongArrayList.size();
     }
 
     @Override
@@ -78,25 +86,25 @@ public class SlateListAdapter extends BaseAdapter {
             mHolder.songDescTextView= (TextView) convertView.findViewById(R.id.songDescTextView);
             mHolder.youtubeButton = (ImageButton) convertView.findViewById(R.id.youtubeButton);
             mHolder.talkButton = (ImageButton) convertView.findViewById(R.id.talkButton);
+            mHolder.talkButtonBadgeTextView = (TextView)convertView.findViewById(R.id.talkButtonBadgeTextView);
 
 
             convertView.setTag(mHolder);
         } else {
             mHolder = (MyViewHolder) convertView.getTag();
         }
-        String formattedString=mSongArrayList.get(position).getDateAddedFormattedString();
+        String formattedString=mFilteredSongArrayList.get(position).getDateAddedFormattedString();
 
-        if(mSongArrayList.size()==0){
+        if(mFilteredSongArrayList.size()==0){
             return convertView;
         }
 
-        //mHolder.songIdTextView.setText(mSongArrayList.get(position).getSongID());
-        mHolder.friendNameTextView.setText(mSongArrayList.get(position).getFriendName());
+        mHolder.friendNameTextView.setText(mFilteredSongArrayList.get(position).getFriendName());
         mHolder.dateAddedTextView.setText(formattedString);
-        mHolder.songDescTextView.setText(mSongArrayList.get(position).getSongDescription());
+        mHolder.songDescTextView.setText(mFilteredSongArrayList.get(position).getSongDescription());
 
         // If unread item, change color of dateAddedTextView to green
-        if(mSongArrayList.get(position).getIsUnreadStatus().equals("1")){
+        if(mFilteredSongArrayList.get(position).getIsUnreadStatus().equals("1")){
             // background : #6EC5B8
             // date-text-color : material_blue_grey_800
             mHolder.containerFrameLayout.setBackgroundColor(Color.parseColor("#6EC5B8"));
@@ -119,21 +127,22 @@ public class SlateListAdapter extends BaseAdapter {
 
         mHolder.youtubeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                try{
-                    ImageButton currentButton = (ImageButton)view;
-                    int currentButtonPosition = (Integer)(view.getTag());
-                    String youtubeUrl = mSongArrayList.get(currentButtonPosition).getYoutubeLink();
+                try {
+                    ImageButton currentButton = (ImageButton) view;
+                    int currentButtonPosition = (Integer) (view.getTag());
+                    callCollapseSearchButton();
+                    String youtubeUrl = mFilteredSongArrayList.get(currentButtonPosition).getYoutubeLink();
 
-                    if(youtubeUrl!=null && (!youtubeUrl.equals(""))){
+                    if (youtubeUrl != null && (!youtubeUrl.equals(""))) {
                         // Case 1 - 1st Play : prevButton is null. So player is inactive
-                        if(prevButtonPosition==-1){
+                        if (prevButtonPosition == -1) {
+                            callCollapseSearchButton();
                             SlateListAdapter.setImageButtonAsStop(currentButton);
                             callOpenYoutubeVideo(youtubeUrl);
                             prevButtonPosition = currentButtonPosition;
-                        }
-                        else{
+                        } else {
                             // Case 2 - Play another song : prevButton's position is different from currentButton's position
-                            if(prevButtonPosition!=currentButtonPosition){
+                            if (prevButtonPosition != currentButtonPosition) {
                                 //Get prevButton from prevButtonPosition and set its image to play
                                 //ImageButton prevButton = currentButton.getParent();
                                 //SlateListAdapter.setImageButtonAsPlay(prevButton);
@@ -144,16 +153,15 @@ public class SlateListAdapter extends BaseAdapter {
                                 notifyDataSetChanged();
                             }
                             // Case 3 - Stop the playing song : prevButton's position is the same as currentButton's position
-                            else{
+                            else {
                                 SlateListAdapter.setImageButtonAsPlay(currentButton);
                                 callCloseYoutubeVideo();
-                                prevButtonPosition=-1;
+                                prevButtonPosition = -1;
                             }
                         }
                     }
 
-                }
-                catch(Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
@@ -162,21 +170,36 @@ public class SlateListAdapter extends BaseAdapter {
         mHolder.talkButton.setTag(position);
         mHolder.talkButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                int currentButtonPosition = (Integer)(view.getTag());
-                String userSongId = mSongArrayList.get(currentButtonPosition).getUserSongID();
+                int currentButtonPosition = (Integer) (view.getTag());
+                String userSongId = mFilteredSongArrayList.get(currentButtonPosition).getUserSongID();
 
 
                 callOpenTalkLinearLayout(userSongId);
-                callCloseYoutubeVideo();
-                if(mContext instanceof SlateActivity){
-                    ((SlateActivity)mContext).callGetTalkAsyncTask(userSongId);
+                callCollapseSearchButton();
+                callHideSearchButton();
+
+                callRevertPlayButtonAndCloseYoutubeVideo();
+                if (mContext instanceof SlateActivity) {
+                    ((SlateActivity) mContext).callGetTalkAsyncTask(userSongId);
                 }
             }
         });
 
+        mHolder.talkButtonBadgeTextView.setText(mFilteredSongArrayList.get(position).getNoOfTalks());
+        if(mFilteredSongArrayList.get(position).getNoOfTalks().equals("0")){
+            mHolder.talkButtonBadgeTextView.setVisibility(View.INVISIBLE);
+        }
+        else{
+            mHolder.talkButtonBadgeTextView.setVisibility(View.VISIBLE);
+        }
+
         return convertView;
     }
 
+    @Override
+    public Filter getFilter() {
+        return mFilter;
+    }
 
 
     static class MyViewHolder {
@@ -189,9 +212,60 @@ public class SlateListAdapter extends BaseAdapter {
         TextView songDescTextView;
         ImageButton youtubeButton;
         ImageButton talkButton;
+        TextView talkButtonBadgeTextView;
 
         ImageButton prevYoutubeButton;
 
+    }
+
+    private class ItemFilter extends Filter {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+
+            String filterString = constraint.toString().toLowerCase();
+
+            FilterResults results = new FilterResults();
+
+            final ArrayList<Song> list = mSongArrayList;
+
+            int count = list.size();
+            final ArrayList<Song> nlist = new ArrayList<Song>(count);
+
+            Song filterableSong ;
+
+            for (int i = 0; i < count; i++) {
+                filterableSong = list.get(i);
+                if (filterableSong.getSongDescription().toLowerCase().contains(filterString) || filterableSong.getFriendName().toLowerCase().contains(filterString)) {
+                    nlist.add(filterableSong);
+                }
+            }
+
+            results.values = nlist;
+            results.count = nlist.size();
+
+            return results;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            mFilteredSongArrayList = (ArrayList<Song>) results.values;
+            notifyDataSetChanged();
+        }
+
+    }
+
+    public void resetFilteredSongArrayList(){
+        int count = mSongArrayList.size();
+        mFilteredSongArrayList = new ArrayList();
+
+        Song filterableSong ;
+
+        for (int i = 0; i < count; i++) {
+            filterableSong = mSongArrayList.get(i);
+            mFilteredSongArrayList.add(filterableSong);
+        }
+        notifyDataSetChanged();
     }
 
     public static void setImageButtonAsPlay(ImageButton imageButton){
@@ -214,6 +288,12 @@ public class SlateListAdapter extends BaseAdapter {
         }
     }
 
+    public void callRevertPlayButtonAndCloseYoutubeVideo(){
+        if(mContext instanceof SlateActivity){
+            ((SlateActivity)mContext).revertPlayButtonAndCloseYoutubeVideo();
+        }
+    }
+
     public void callOpenTalkLinearLayout(String userSongId){
         if(mContext instanceof SlateActivity){
             ((SlateActivity)mContext).openTalkLinearLayout(userSongId);
@@ -224,6 +304,19 @@ public class SlateListAdapter extends BaseAdapter {
             ((SlateActivity)mContext).closeTalkLinearLayout();
         }
     }
+
+    public void callCollapseSearchButton(){
+        if(mContext instanceof SlateActivity) {
+            ((SlateActivity) mContext).collapseSearchButton();
+        }
+    }
+
+    public void callHideSearchButton(){
+        if(mContext instanceof SlateActivity) {
+            ((SlateActivity) mContext).hideSearchButton();
+        }
+    }
+
 
 
 

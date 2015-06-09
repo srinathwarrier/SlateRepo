@@ -10,6 +10,7 @@ import android.provider.Settings;
 import android.util.Log;
 
 import com.slate1.activities.SlateActivity;
+import com.slate1.util.Connections;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,7 +27,7 @@ import java.net.URL;
 /**
  * Created by I076630 on 06-May-15.
  */
-public class AddUserAsyncTask extends AsyncTask<Void,Void,Void>{
+public class AddUserAsyncTask extends AsyncTask<Void,Void,String>{
 
     String userName;
     String userEmail;
@@ -58,13 +59,11 @@ public class AddUserAsyncTask extends AsyncTask<Void,Void,Void>{
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    protected String doInBackground(Void... params) {
         StringBuilder builder = null;
         try {
-            String urlStr= "https://slate-muzak.rhcloud.com/createNewUser.php?android_id='"+android_id+"'&name='"+userName+"'&email='"+userEmail+"'&reg_id='"+registrationId+"'";
-            URL url = new URL(urlStr);
-            URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
-            url = uri.toURL();
+            String urlString = new Connections().getAddUserURL(android_id,userName,userEmail,registrationId);
+            URL url = new URL(urlString);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
             String line;
@@ -74,16 +73,22 @@ public class AddUserAsyncTask extends AsyncTask<Void,Void,Void>{
             );
             BufferedReader reader = new BufferedReader(isr);
             while ((line = reader.readLine()) != null) builder.append(line);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
+            return builder.toString();
+        }catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+        return null;
+    }
+
+    @Override
+    protected void onPostExecute(String resultString) {
+        super.onPostExecute(resultString);
+
         try {
-            JSONArray json = new JSONArray(builder.toString());
+            JSONArray json = new JSONArray();
             Log.i("Slate:AddUser","1:"+json.toString() +" 2:"+json.get(0) );
 
             // Get userId and fill into this.resultUserId
@@ -100,12 +105,6 @@ public class AddUserAsyncTask extends AsyncTask<Void,Void,Void>{
             e.printStackTrace();
         }
 
-        return null;
-    }
-
-    @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
 
         if(resultUserId!=null)
         {

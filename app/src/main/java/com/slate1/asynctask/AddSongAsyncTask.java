@@ -8,6 +8,7 @@ import android.util.Log;
 import com.slate1.adapters.SlateListAdapter;
 import com.slate1.entities.Song;
 import com.slate1.interfaces.SlateListAsyncResponse;
+import com.slate1.util.Connections;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -57,22 +58,10 @@ public class AddSongAsyncTask extends AsyncTask<Void,Void,String>{
         mSongArrayList.clear();
         StringBuilder builder = null;
         try {
-            String query2 = Uri.encode(query, "UTF-8");
-            String urlStr= "https://slate-muzak.rhcloud.com/addSong.php?id="+userId+"&song_name="+query;
-            URL url = new URL(urlStr);
-            URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
-            url = uri.toURL();
-            //URL url = new URL("https://slate-muzak.rhcloud.com/addSong.php?id=1&song_name="+query2);
-            URI uri2 = new URI(
-                    "https",
-                    "slate-muzak.rhcloud.com",
-                    "/addSong.php",
-                    "id="+this.userId+"&song_name="+this.query+"&url="+this.youtubeLinkString,
-                    null);
-            String request = uri2.toASCIIString();
-            URL url2 = new URL(request);
+            String urlString = new Connections().getAddSongURL(userId,query,youtubeLinkString);
+            URL url = new URL(urlString);
 
-            HttpURLConnection urlConnection = (HttpURLConnection) url2.openConnection();
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
             String line;
             builder = new StringBuilder();
@@ -82,9 +71,7 @@ public class AddSongAsyncTask extends AsyncTask<Void,Void,String>{
             BufferedReader reader = new BufferedReader(isr);
             while ((line = reader.readLine()) != null) builder.append(line);
             return builder.toString();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
+        }  catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
@@ -116,6 +103,7 @@ public class AddSongAsyncTask extends AsyncTask<Void,Void,String>{
                 songObject.setIsUnreadStatus(object.get("Status").toString());
                 songObject.setYoutubeLink(object.get("YoutubeLink").toString());
                 songObject.setUserSongID(object.get("ID").toString());
+                songObject.setNoOfTalks(object.get("No_of_Comments").toString());
                 Log.i("Slate - song list", "object:" + songObject.toString());
                 mSongArrayList.add(songObject);
             }
@@ -128,13 +116,10 @@ public class AddSongAsyncTask extends AsyncTask<Void,Void,String>{
         }
 
 
-        mSlateListAdapter.notifyDataSetChanged();
+        mSlateListAdapter.resetFilteredSongArrayList(); // includes notifyDataSetChanged()
         if(this.mSwipeRefreshLayout !=null){
             mSwipeRefreshLayout.setRefreshing(false);
         }
-
-        //Refresh the Slate
-        //slateListAsyncResponseDelegate.refreshSlate();
 
     }
 }

@@ -14,6 +14,7 @@ import com.slate1.adapters.SlateListAdapter;
 import com.slate1.adapters.TalkListAdapter;
 import com.slate1.entities.Song;
 import com.slate1.entities.Talk;
+import com.slate1.util.Connections;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -59,7 +60,6 @@ public class AddTalkAsyncTask extends AsyncTask<Void,Void,String>{
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        this.talkText = this.talkText.replace("&","%26"); //TODO : Check this !!
         mTalkArrayList.clear();
 
         progress = new ProgressDialog(this.mContext);
@@ -74,14 +74,8 @@ public class AddTalkAsyncTask extends AsyncTask<Void,Void,String>{
     protected String doInBackground(Void... params) {
         StringBuilder builder = null;
         try {
-            URI uri = new URI(
-                    "https",
-                    "slate-muzak.rhcloud.com",
-                    "/insertComment.php",
-                    "id="+this.userId+"&usersongid="+this.userSongId+"&text="+this.talkText,
-                    null);
-            String request = uri.toASCIIString();
-            URL url = new URL(request);
+            String urlString = new Connections().getAddTalkURL(userId,userSongId,talkText);
+            URL url = new URL(urlString);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
 
@@ -93,8 +87,6 @@ public class AddTalkAsyncTask extends AsyncTask<Void,Void,String>{
             BufferedReader reader = new BufferedReader(isr);
             while ((line = reader.readLine()) != null) builder.append(line);
             return (builder.toString());
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
