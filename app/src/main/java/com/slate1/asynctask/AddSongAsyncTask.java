@@ -91,7 +91,6 @@ public class AddSongAsyncTask extends AsyncTask<Void,Void,String>{
             JSONArray json = new JSONArray(resultString);
 
             for (int i = 0; i < json.length(); i++) {
-                Log.i("Brandstore - Outletlist", "Start ");
                 songObject = new Song();
                 JSONObject object = json.getJSONObject(i);
 
@@ -104,7 +103,7 @@ public class AddSongAsyncTask extends AsyncTask<Void,Void,String>{
                 songObject.setYoutubeLink(object.get("YoutubeLink").toString());
                 songObject.setUserSongID(object.get("ID").toString());
                 songObject.setNoOfTalks(object.get("No_of_Comments").toString());
-                Log.i("Slate - song list", "object:" + songObject.toString());
+                //Log.i("Slate - song list", "object:" + songObject.toString());
                 mSongArrayList.add(songObject);
             }
 

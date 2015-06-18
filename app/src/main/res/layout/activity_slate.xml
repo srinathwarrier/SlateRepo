@@ -1,144 +1,170 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.slate1.activities.SlateActivity"
-    >
+<!-- A DrawerLayout is intended to be used as the top-level content view using match_parent for both width and height to consume the full space available. -->
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:id="@+id/drawer_layout"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    tools:context=".MainActivity">
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:context="com.slate1.activities.SlateActivity"
-        android:id="@+id/activity_slate_swipe_refresh_layout"
-        android:layout_above="@+id/videoLinearLayout"
-        android:background="#EDEDED"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        >
-
-        <ListView
-            android:id="@+id/slate_list_list_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:dividerHeight="10dp"
-            android:divider="@null"
-            />
-
-    </android.support.v4.widget.SwipeRefreshLayout>
-
-    <ImageButton
-        android:id="@+id/add_button"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:background="@drawable/add_button"
-        android:layout_alignParentRight="true"
-        android:layout_above="@+id/videoLinearLayout"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="20dp"
-        android:src="@android:drawable/ic_input_add"
-        android:tint="#FFFFFF"
-        />
-    <LinearLayout
-        android:id="@+id/addSongLinearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        android:layout_below="@+id/activity_slate_swipe_refresh_layout"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
-        android:layout_alignTop="@+id/activity_slate_swipe_refresh_layout"
-        android:background="#DBDB70"
-        >
-
-        <android.widget.SearchView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/suggestionSearchView"
-            />
-
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/suggestionListView">
-
-        </ListView>
-
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/songsListView">
-
-        </ListView>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:id="@+id/talkLinearLayout">
 
         <RelativeLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="#93E2D5"
+            android:layout_height="match_parent"
+            tools:context="com.slate1.activities.SlateActivity"
             >
 
-            <ListView
+            <android.support.v4.widget.SwipeRefreshLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/talkListView"
-                android:layout_above="@+id/talkBottomLayout"/>
+                android:layout_height="wrap_content"
+                tools:context="com.slate1.activities.SlateActivity"
+                android:id="@+id/activity_slate_swipe_refresh_layout"
+                android:layout_above="@+id/videoLinearLayout"
+                android:background="#EDEDED"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                >
+
+                <ListView
+                    android:id="@+id/slate_list_list_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:dividerHeight="10dp"
+                    android:divider="@null"
+                    />
+
+            </android.support.v4.widget.SwipeRefreshLayout>
+
+            <ImageButton
+                android:id="@+id/add_button"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@drawable/add_button"
+                android:layout_alignParentRight="true"
+                android:layout_above="@+id/videoLinearLayout"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="20dp"
+                android:src="@android:drawable/ic_input_add"
+                android:tint="#FFFFFF"
+                />
+            <LinearLayout
+                android:id="@+id/addSongLinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                android:layout_below="@+id/activity_slate_swipe_refresh_layout"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:layout_alignTop="@+id/activity_slate_swipe_refresh_layout"
+                android:background="#DBDB70"
+                >
+
+                <android.widget.SearchView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/suggestionSearchView"
+                    />
+
+                <ListView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/suggestionListView">
+
+                </ListView>
+
+                <ListView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/songsListView">
+
+                </ListView>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:id="@+id/talkLinearLayout">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="#93E2D5"
+                    >
+
+                    <ListView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/talkListView"
+                        android:layout_above="@+id/talkBottomLayout"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:orientation="horizontal"
+                        android:id="@+id/talkBottomLayout">
+
+                        <EditText
+                            android:id="@+id/talkEditText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:hint="Your talk goes here..."
+                            >
+                        </EditText>
+
+                        <Button
+                            android:id="@+id/talkSendButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.2"
+                            android:text="Send" >
+                        </Button>
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="vertical"
                 android:layout_alignParentBottom="true"
-                android:orientation="horizontal"
-                android:id="@+id/talkBottomLayout">
-
-                <EditText
-                    android:id="@+id/talkEditText"
-                    android:layout_width="0dp"
+                android:id="@+id/videoLinearLayout">
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="Your talk goes here..."
-                    >
-                </EditText>
+                    android:orientation="vertical"
+                    android:id="@+id/videoContainer">
 
-                <Button
-                    android:id="@+id/talkSendButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.2"
-                    android:text="Send" >
-                </Button>
+                </LinearLayout>
             </LinearLayout>
+
 
         </RelativeLayout>
 
 
-    </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_alignParentBottom="true"
-        android:id="@+id/videoLinearLayout">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:id="@+id/videoContainer">
+    <!-- android:layout_gravity="start" tells DrawerLayout to treat
+         this as a sliding drawer on the left side for left-to-right
+         languages and on the right side for right-to-left languages.
+         If you're not building against API 17 or higher, use
+         android:layout_gravity="left" instead. -->
+    <!-- The drawer is given a fixed width in dp and extends the full height of
+         the container. -->
+    <!--<fragment android:id="@+id/navigation_drawer"-->
+        <!--android:layout_width="0dp" android:layout_height="match_parent"-->
+        <!--android:layout_gravity="start"-->
+        <!--android:name="com.slate1.NavigationDrawerFragment"-->
+        <!--tools:layout="@layout/fragment_navigation_drawer"-->
 
-        </LinearLayout>
-    </LinearLayout>
+         <!--/>-->
 
-
-</RelativeLayout>
+</android.support.v4.widget.DrawerLayout>

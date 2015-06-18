@@ -12,6 +12,7 @@ import android.util.Log;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.slate1.activities.SlateActivity;
 import com.slate1.entities.NotificationMessage;
+import com.slate1.SlateApplication.NotificationStatus;
 
 import java.util.ArrayList;
 
@@ -46,26 +47,11 @@ public class GcmIntentService extends IntentService {
                 String notificationTypeString = intent.getStringExtra("type");
                 String displayMessage = intent.getStringExtra("message");
                 String userSongId = intent.getStringExtra("usersongid");
-
-                int notificationTypeInt ;
-                if(notificationTypeString != null){
-                    notificationTypeInt = Integer.parseInt(notificationTypeString);
+                if(notificationTypeString!=null) {
+                    int notificationTypeInt = Integer.parseInt(notificationTypeString);
+                    NotificationMessage notificationMessage = new NotificationMessage(notificationTypeInt , displayMessage,userSongId );
+                    sendNotification(notificationMessage);
                 }
-                else{
-                    //TODO: Remove this as well
-                    if(displayMessage.toLowerCase().contains(("has added").toLowerCase())){
-                        notificationTypeInt = 1;
-                        userSongId ="";
-                    }
-                    else{// if(displayMessage.toLowerCase().contains(("has talked").toLowerCase())){
-                        notificationTypeInt = 2;
-                        userSongId = "278";
-                    }
-                }
-
-                NotificationMessage notificationMessage = new NotificationMessage(notificationTypeInt , displayMessage,userSongId );
-
-                sendNotification(notificationMessage);
                 Log.i(TAG, "Received: " + extras.toString());
             }
         }
@@ -83,12 +69,14 @@ public class GcmIntentService extends IntentService {
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         intent.putExtra("IS_NOTIFICATION", true);
         intent.putExtra("NOTIFICATION_TYPE", notificationMessage.getNotificationType());
-        intent.putExtra("USER_SONG_ID", notificationMessage.getUserSongId());
 
 
         SlateApplication application = (SlateApplication) getApplication();
-        int notificationStatus = SlateApplication.addNotification(notificationMessage);
+        NotificationStatus notificationStatus = SlateApplication.addNotification(notificationMessage);
         int numMessages = application.getNumUnreadMessages();
+
+        intent.putExtra("USER_SONG_ID", SlateApplication.getCombinedUserSongId());
+        //intent.putExtra("NOTIFICATION_STATUS", notificationStatus);
 
 
         NotificationCompat.InboxStyle inboxStyle = application.getInboxStyle();
@@ -109,13 +97,13 @@ public class GcmIntentService extends IntentService {
             // For more than 1 notifications
             contentTitle = numMessages+" new notifications";
             contextText = numMessages+" notifications";
-            if(notificationStatus ==1){ // 1: only ADD_SONG
+            if(notificationStatus == NotificationStatus.ONLY_ADD_SONG){ // 1: only ADD_SONG
                 contextText =  numMessages +" songs have been added";
             }
-            else if(notificationStatus ==2){// 2: only TALK_SONG
+            else if(notificationStatus ==NotificationStatus.SAME_TALK_SONG){// 2: only TALK_SONG
                 contextText = numMessages+" new talks";
             }
-            else if(notificationStatus ==3){ // 3 : both
+            else if(notificationStatus ==NotificationStatus.ALL_TYPES){ // 3 : both
                 contextText = "New songs, New talks";
             }
         }

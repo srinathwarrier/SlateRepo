@@ -5,4 +5,5 @@ package com.slate1.interfaces;
  */
 public interface SlateListAsyncResponse {
     void refreshSlate();
+    void refreshSlateInBackground();
 }

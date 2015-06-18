@@ -14,6 +14,7 @@ import com.slate1.adapters.SlateListAdapter;
 import com.slate1.adapters.TalkListAdapter;
 import com.slate1.entities.Song;
 import com.slate1.entities.Talk;
+import com.slate1.interfaces.SlateListAsyncResponse;
 import com.slate1.util.Connections;
 
 import org.json.JSONArray;
@@ -45,6 +46,7 @@ public class AddTalkAsyncTask extends AsyncTask<Void,Void,String>{
     TalkListAdapter mTalkListAdapter;
 
     EditText mEditText;
+    public SlateListAsyncResponse delegate;
 
     public AddTalkAsyncTask(String userId, String userSongId, String talkText, ArrayList<Talk> mTalkArrayList, TalkListAdapter mTalkListAdapter,Context mContext,EditText mEditText)
     {
@@ -125,6 +127,11 @@ public class AddTalkAsyncTask extends AsyncTask<Void,Void,String>{
 
         mTalkListAdapter.notifyDataSetChanged();
         mEditText.setText("");
+
+        if(delegate!=null){
+            delegate.refreshSlateInBackground();
+        }
+
         progress.dismiss();
 
     }

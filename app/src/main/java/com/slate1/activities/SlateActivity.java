@@ -4,9 +4,14 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +31,7 @@ import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import com.slate1.NavigationDrawerFragment;
 import com.slate1.R;
 import com.slate1.SlateApplication;
 import com.slate1.adapters.SlateListAdapter;
@@ -47,13 +53,22 @@ import com.slate1.video_test.VideoFragment;
 
 import java.util.ArrayList;
 
-public class SlateActivity extends AppCompatActivity implements SlateListAsyncResponse,
-        SearchView.OnQueryTextListener, SuggestionAsyncResponse {
+public class SlateActivity extends AppCompatActivity
+        implements  SlateListAsyncResponse,
+                    SearchView.OnQueryTextListener,
+                    SuggestionAsyncResponse
+        //,         NavigationDrawerFragment.NavigationDrawerCallbacks
+{
 
     // Default parameters :
     public static final String PREFS_NAME = "MyPrefsFile";
     public String userId;
     public Context mContext;
+
+    // Fragment managing the behaviors, interactions and presentation of the navigation drawer.
+    //private NavigationDrawerFragment mNavigationDrawerFragment;
+    //private ActionBarDrawerToggle mDrawerToggle;
+
 
     // Slate values :
     ArrayList<Song> songArrayList = new ArrayList();
@@ -128,6 +143,14 @@ public class SlateActivity extends AppCompatActivity implements SlateListAsyncRe
         // Fetch userId from SharedPreferences
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         userId = settings.getString("userId","1"); // Set to 1 if value not present
+
+        // NavigationDrawer :
+        //mNavigationDrawerFragment = (NavigationDrawerFragment)
+//                getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
+//        // Set up the drawer.
+//        mDrawerToggle= mNavigationDrawerFragment.setUp(
+//                R.id.navigation_drawer,
+//                (DrawerLayout) findViewById(R.id.drawer_layout));
 
         // SlateListView :
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_slate_swipe_refresh_layout);
@@ -236,6 +259,10 @@ public class SlateActivity extends AppCompatActivity implements SlateListAsyncRe
         getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
+
+        // Notifications
+        onNewIntent(getIntent());
+
     }
 
 
@@ -250,13 +277,17 @@ public class SlateActivity extends AppCompatActivity implements SlateListAsyncRe
     @Override
     protected void onNewIntent(Intent i) {
 
-        boolean isNotification = i.getExtras().getBoolean("IS_NOTIFICATION");
+        boolean isNotification=false;
+        if(i.getExtras()!=null && i.getExtras().getBoolean("IS_NOTIFICATION")){
+            isNotification =true;
+        }
         if(isNotification){
             SlateApplication application = (SlateApplication) getApplication();
             int currentNumUnreadMessages = application.getNumUnreadMessages();
             application.removeAllNotifications();            // clear the Messages in the InboxStyle
-            String notificationTypeString = i.getExtras().getString("NOTIFICATION_TYPE");
+            //String notificationTypeString = i.getExtras().getString("NOTIFICATION_TYPE");
             SlateApplication.NotificationType notificationType = (SlateApplication.NotificationType)i.getSerializableExtra("NOTIFICATION_TYPE");
+            //SlateApplication.NotificationStatus notificationStatus = (SlateApplication.NotificationStatus)i.getSerializableExtra(("NOTIFICATION_STATUS"));
             String userSongId=i.getExtras().getString("USER_SONG_ID");
 
             // When coming from notification click,
@@ -264,8 +295,7 @@ public class SlateActivity extends AppCompatActivity implements SlateListAsyncRe
             // If (notificationType == addedSong ) , then simply refresh the screen
 
 
-            if(currentNumUnreadMessages == 1 &&
-                    notificationType!=null &&
+            if( notificationType!=null &&
                     notificationType == SlateApplication.NotificationType.TALK_SONG &&
                     userSongId!=null &&
                     !userSongId.equals("")  ){
@@ -278,6 +308,22 @@ public class SlateActivity extends AppCompatActivity implements SlateListAsyncRe
                     callGetTalkAsyncTask(userSongId);
 
             }
+            else {
+                collapseSearchButton();
+                hideSearchButton();
+                revertPlayButtonAndCloseYoutubeVideo();
+                closeTalkLinearLayout();
+            }
+/*            else if(currentNumUnreadMessages != 1 &&
+                    notificationType!=null &&
+                    notificationType == SlateApplication.NotificationType.TALK_SONG &&
+                    userSongId!=null &&
+                    !userSongId.equals("") &&
+                    notificationStatus !=null &&
+                    notificationStatus == SlateApplication.NotificationStatus.SAME_TALK_SONG
+                    ){
+
+            }*/
 
         }
 
@@ -367,6 +413,12 @@ public class SlateActivity extends AppCompatActivity implements SlateListAsyncRe
         SlateListAsyncTask mSlateListAsyncTask = new SlateListAsyncTask(songArrayList, mSlateListAdapter ,userId , mSwipeRefreshLayout);
         mSlateListAsyncTask.execute();
         scrollToTop();
+    }
+
+    @Override
+    public void refreshSlateInBackground() {
+        SlateListAsyncTask mSlateListAsyncTask = new SlateListAsyncTask(songArrayList, mSlateListAdapter ,userId , mSwipeRefreshLayout);
+        mSlateListAsyncTask.execute();
     }
 
     public void scrollToTop(){
@@ -537,8 +589,33 @@ public class SlateActivity extends AppCompatActivity implements SlateListAsyncRe
 
     public void callAddTalkAsyncTask(String userId, String userSongId, String talkText){
         AddTalkAsyncTask addTalkAsyncTask = new AddTalkAsyncTask(userId, userSongId, talkText, talkArrayList, talkListAdapter,this, talkEditText);
+        addTalkAsyncTask.delegate= this;
         addTalkAsyncTask.execute();
     }
 
+    public void talkScreenScrollToBottom(){
+        talkListView.smoothScrollToPosition(talkListAdapter.getCount()-1);
+    }
 
+
+    /*@Override
+    public void onNavigationDrawerItemSelected(int position) {
+        // update the main content by replacing fragments
+
+    }
+
+
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        //mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        //mDrawerToggle.onConfigurationChanged(newConfig);
+    }*/
 }

@@ -14,9 +14,12 @@ import java.util.Map;
  * Created by i076324 on 5/31/2015.
  */
 public class Connections {
+
+    // SET THIS BOOLEAN VARIABLE TO FALSE FOR TESTING
+    boolean isLiveSystem=true;
+
     //public String getSlateItemsURL = "https://slate-muzak.rhcloud.com/getSlateItems.php?id=";
     public static String ipAddress  = "ec2-52-25-222-182.us-west-2.compute.amazonaws.com";
-    boolean isLiveSystem=false;
     private String systemName="slate";
     String versionName="v1";
     public Connections(){

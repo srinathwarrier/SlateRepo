@@ -61,8 +61,8 @@ public class GetSuggestionsAsyncTask extends AsyncTask<Void,Void,Document>{
     @Override
     protected Document doInBackground(Void... params) {
         try {
+            if(this.suggestionString.equals(""))return null;
             String urlStr="https://suggestqueries.google.com/complete/search?client=toolbar&ds=yt&q="+this.suggestionString;
-            URL url = new URL(urlStr);
 
             URI uri = new URI(
                     "https",
@@ -71,11 +71,8 @@ public class GetSuggestionsAsyncTask extends AsyncTask<Void,Void,Document>{
                     "client=toolbar&ds=yt&q="+this.suggestionString,
                     null);
             String request = uri.toASCIIString();
-            URL url2 = new URL(request);
-
-
-
-            URLConnection connection = url2.openConnection();
+            URL url = new URL(request);
+            URLConnection connection = url.openConnection();
 
             Document doc = parseXML(connection.getInputStream());
             return doc;
@@ -97,11 +94,15 @@ public class GetSuggestionsAsyncTask extends AsyncTask<Void,Void,Document>{
         super.onPostExecute(doc);
 
         try {
-            NodeList descNodes = doc.getElementsByTagName("suggestion");
+            if(doc==null){
+                stringArrayList.clear();
+            }else{
+                NodeList descNodes = doc.getElementsByTagName("suggestion");
 
-            for (int i = 0; i < descNodes.getLength(); i++) {
-                String temp = descNodes.item(i).getAttributes().getNamedItem("data").getNodeValue();
-                stringArrayList.add(temp);
+                for (int i = 0; i < descNodes.getLength(); i++) {
+                    String temp = descNodes.item(i).getAttributes().getNamedItem("data").getNodeValue();
+                    stringArrayList.add(temp);
+                }
             }
         }
         catch(Exception e){

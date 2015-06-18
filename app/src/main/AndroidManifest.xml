@@ -31,7 +31,6 @@
         </activity>
         <activity
             android:name=".activities.SlateActivity"
-            android:launchMode="singleTop"
             android:label="@string/title_activity_slate"> <!-- TODO: Add android:noHistory="true" as a temporary fix for notification back issue. -->
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />

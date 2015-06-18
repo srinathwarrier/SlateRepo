@@ -364,7 +364,6 @@ public class MainActivity extends AppCompatActivity implements CheckUserAsyncRes
     private void storeRegistrationId(Context context, String regId) {
         final SharedPreferences prefs = getGCMPreferences(context);
         int appVersion = getAppVersion(context);
-        Log.i(TAG, "Saving regId on app version " + appVersion);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(PROPERTY_REG_ID, regId);
         editor.putInt(PROPERTY_APP_VERSION, appVersion);
